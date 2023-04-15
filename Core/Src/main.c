@@ -54,19 +54,33 @@ uint8_t               RxData1[8];
 
 uint8_t CAN_BUFFER_SIZE = 8;
 CAN_TxHeaderTypeDef Tx1Header;
-uint8_t TxData_CAN[2] = {0};
+CAN_TxHeaderTypeDef Tx2Header;
+
+uint8_t TxData_CAN1[8] = {0};
 uint8_t TxData_CAN2[8] = {0};
-uint8_t TxData_CAN3[8] = {0};
-uint16_t TX_ID = 404;
-uint16_t TX_ID2 = 95;
-uint16_t TX_ID3 = 7;
+uint8_t TxData_CAN3[7] = {0};
+uint8_t TxData_CAN4[6] = {0};
+
+uint32_t TX_ID1 = 7;
+uint32_t TX_ID2 = 95;
+uint32_t TX_ID3 = 404;
+uint32_t TX_ID4 = 888;
+
+uint8_t TxTime1 = 50;
+uint8_t TxTime2 = 2;
+uint8_t TxTime3 = 9;
+uint8_t TxTime4 = 11;
+
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
-uint8_t RxTime = 49;
-uint8_t RxTime1 = 50;
-uint16_t tenth_ms = 0;
-uint16_t tenth_ms1 = 0;
-uint16_t tenth_ms2 = 0;
+uint32_t mailbox1;
+
+uint16_t averageCnt_ms = 0;
+uint16_t ms1 = 0;
+uint16_t ms2 = 0;
+uint16_t ms3 = 0;
+uint16_t ms4 = 0;
+
 uint8_t averageCount = 10;
 volatile uint8_t channel = 0;
 volatile uint32_t averageTemp = 0;
@@ -74,16 +88,17 @@ volatile uint32_t averageValue[16]= {0};
 volatile uint16_t Voltage[16]= {0};
 uint32_t AD_DMA[16] = {0};
 
+uint16_t Vref_5V = 5040;
+uint16_t Rntc[4] = {0};
+
 uint16_t BrakepressRear = 0;
 double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
 double WspdFL = 0;
+uint8_t numOfWhlSpdTrig = 8;
 uint16_t suspotRL = 0;
 uint16_t suspotRR = 0;
-uint16_t suspotFL = 0;
-uint16_t suspotFR = 0;
-uint16_t steeringangle = 0;
 uint16_t CoolanttempLower = 0;
 uint16_t Coolantpressure = 0;
 uint16_t Oilpress = 0;
@@ -162,47 +177,20 @@ static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 void CanDataTx_CAN(uint16_t);
 void ADC_ValueAverage(void);
-//void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1);
-//void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
+void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1);
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-  if(tenth_ms >= RxTime)
-  {
-		
-		/*
-		CAN_BUFFER_SIZE = 8;
-		CanDataTx_CAN(TX_ID3);
-		//Asentopotikat cancelloitu!
-		//HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN3, &mailbox);
-		*/
-		
-		CAN_BUFFER_SIZE = 8;
-		CanDataTx_CAN(TX_ID2);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN2, &mailbox);
-		
-		tenth_ms = 0;
-  }
-	
-	if(tenth_ms2 >= RxTime1)
-  {
-		CAN_BUFFER_SIZE = 2;
-		CanDataTx_CAN(TX_ID);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN, &mailbox);
-		
-		tenth_ms2 = 0;
-	}
-	
-  if(htim->Instance==TIM4)
+	if(htim->Instance==TIM4)
 	{
-    tenth_ms++;
-		tenth_ms2++;
+		ms1++;
+		ms2++;
+		ms3++;
+		ms4++;
 		ms25++;
 		if(ms25 == 1000){
 			sec++; ms25 = 0;
@@ -225,9 +213,47 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(rpm_ch3_ms > 2000)
 			WspdFL = 0;
 	}
+	
+	if(ms1 >= TxTime1)
+	{
+		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
+		CanDataTx_CAN(TX_ID1);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
+		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN3, &mailbox);
+		
+		ms1 = 0;
+	}
+	if(ms2 >= TxTime2)
+	{
+		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
+		CanDataTx_CAN(TX_ID2);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
+		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN1, &mailbox);
+		
+		ms2 = 0;
+	}
+	if(ms3 >= TxTime3)
+	{
+		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
+		CanDataTx_CAN(TX_ID3);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
+		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_EXTRA1, &mailbox);
+		
+		ms3 = 0;
+	}
+	if(ms4 >= TxTime4)
+	{
+		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
+		CanDataTx_CAN(TX_ID4);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN4, &mailbox);
+		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_EXTRA2, &mailbox);
+		
+		ms4 = 0;
+	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == SET){
+		
 		if(rpm_ch0_trig == 0){
-			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/8)*60;
+			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch0_trig = 1;
 			rpm_ch0_ms = 0;
 			
@@ -236,15 +262,16 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
-				WspdRR = rpm_ave_01/rpm_count;
+				WspdRL = rpm_ave_01/rpm_count;
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
 		}
 	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == SET){
+		
 		if(rpm_ch1_trig == 0){
-			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/1000))/8)*60;
+			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch1_trig = 1;
 			rpm_ch1_ms = 0;
 			
@@ -253,51 +280,49 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_1++;
 			}
 			if(rpm_ave_count_1 == rpm_count){
-				WspdRL = rpm_ave_11/rpm_count;
+				WspdRR = rpm_ave_11/rpm_count;
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
 			}
 		}
 	}
-
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET){
 	
 		if(rpm_ch2_trig == 0){
-			rpm_ave_2 = (((double)1/((double)rpm_ch2_ms/1000))/8)*60;
+			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
-		
+			
 			if(rpm_ave_count_2 < rpm_count){
 				rpm_ave_21 = rpm_ave_2 + rpm_ave_21;
 				rpm_ave_count_2++;
 			}
 			if(rpm_ave_count_2 == rpm_count){
-				WspdFR = rpm_ave_21/rpm_count;
+				EXTRA2 = rpm_ave_21/rpm_count;
 				rpm_ave_21 = 0;
 				rpm_ave_count_2 = 0;
 			}
 		}
 	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
-	
+		
 		if(rpm_ch3_trig == 0){
-			rpm_ave_3= (((double)1/((double)rpm_ch3_ms/1000))/8)*60;
+			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
-				
+		
 			if(rpm_ave_count_3 < rpm_count){
 				rpm_ave_31 = rpm_ave_3 + rpm_ave_31;
 				rpm_ave_count_3++;
 			}
 			if(rpm_ave_count_3 == rpm_count){
-				WspdFL = rpm_ave_31/rpm_count;
+				EXTRA1 = rpm_ave_31/rpm_count;
 				rpm_ave_31 = 0;
 				rpm_ave_count_3 = 0;
 			}
 		}
 	}
 }
-
 
 
 /* USER CODE END 0 */
@@ -331,14 +356,13 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CAN1_Init();
-	MX_DMA_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-	__HAL_RCC_CAN1_CLK_ENABLE();
 	
 	//Järjestys
 	//MX_DMA_Init();
@@ -362,62 +386,91 @@ int main(void)
 		//Voltage[8] = (averageValue[8] * 3300) / 4096;
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
 		
-		/*BrakepressRear = Voltage[0];
-		suspotRL = Voltage[1] - 1570;
+		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
+		
+		suspotRL = Voltage[1] - 1596;
 		suspotRR = Voltage[2];
+		
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
-		CoolanttempLower = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[8]/1000))-3400))+297.61+274.15));
-		Coolantpressure = Voltage[9];
-		Oilpress = Voltage[10];
+		
+		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
+		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
+		
+		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
+		Oilpress = (uint8_t)(0.025*(double)Voltage[10]-12.5);
+		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
-		Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61 +274.15));
+		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
+		
+		Rntc[1] = ((double)Voltage[11]/((Vref_5V-(double)Voltage[11])/2400))-1000;
+		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
+		
+		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
+			EXTRA1 = Voltage[6];}
+		else if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET) {
+			EXTRA1 = 0;}
+		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == RESET){
+			EXTRA2 = Voltage[7];}
+		else if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
+			EXTRA2 = 0;}
+		
 		EXTRA3 = Voltage[3];
 		EXTRA4 = Voltage[12];
 		EXTRA5 = Voltage[13];
 		EXTRA6 = Voltage[14];
 		EXTRA7 = Voltage[15];
-		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
-		EXTRA1 = Voltage[6];}
-		//if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET) {EXTRA1 = 0;}
-		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == RESET){
-		EXTRA2 = Voltage[7];}*/
-		//if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){ EXTRA2 = 0;}
 		
-		suspotFL=Voltage[8];
-		suspotFR=Voltage[9];
-		suspotRL=Voltage[10];
-		suspotRR=Voltage[11];
-		steeringangle = Voltage[13];
+		//First message data
+		TxData_CAN1[0] = Oiltemp;
+		TxData_CAN1[1] = CoolanttempLower;
+			
+		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
+		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
+			
+		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
+		TxData_CAN1[5] = Coolantpressure >> 8; //4 high bits
+			
+		TxData_CAN1[6] = EXTRA1 & 0x00FF; //8 low bits
+		TxData_CAN1[7] = EXTRA1 >> 8; //4 high bits
 		
-		TxData_CAN[0] = steeringangle & 0x00FF; //8 low bits
-		TxData_CAN[1] = steeringangle >> 8; //4 high bits
+		//Second message data
+		TxData_CAN2[0] = suspotRL & 0x00FF; //8 low bits
+		TxData_CAN2[1] = suspotRL >> 8; //4 high bits
 		
+		TxData_CAN2[2] = suspotRR & 0x00FF; //8 low bits
+		TxData_CAN2[3] = suspotRR >> 8; //4 high bits
 		
+		//Filter glitches
+		if(WspdRL < 2000){
+			TxData_CAN2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
+			TxData_CAN2[5] = (uint16_t)WspdRL >> 8; //4 high bits
+		}
+		if(WspdRR < 2000){
+			TxData_CAN2[6] = (uint16_t)WspdRR & 0x00FF; //8 low bits
+			TxData_CAN2[7] = (uint16_t)WspdRR >> 8; //4 high bits
+		}
 		
-		TxData_CAN2[0] = (uint16_t) WspdRR & 0x00FF; //8 low bits
-		TxData_CAN2[1] = (uint16_t) WspdRR >> 8; //4 high bits
+		//Third message data
+		TxData_CAN3[0] = BrakepressRear; //8 low bits
 		
-		TxData_CAN2[2] = (uint16_t) WspdRL & 0x00FF; //8 low bits
-		TxData_CAN2[3] = (uint16_t) WspdRL >> 8; //4 high bits
+		TxData_CAN3[1] = EXTRA2 & 0x00FF; //4 high bits
+		TxData_CAN3[2] = EXTRA2 >> 8; //8 low bits
 		
-		TxData_CAN2[4] = (uint16_t) WspdFL & 0x00FF; //8 low bits
-		TxData_CAN2[5] = (uint16_t) WspdFL >> 8; //4 high bits
+		TxData_CAN3[3] = EXTRA3 & 0x00FF; //4 high bits
+		TxData_CAN3[4] = EXTRA3 >> 8; //8 low bits
 		
-		TxData_CAN2[6] = (uint16_t) WspdFR & 0x00FF; //8 low bits
-		TxData_CAN2[7] = (uint16_t) WspdFR >> 8; //4 high bits
+		TxData_CAN3[5] = EXTRA4 & 0x00FF; //4 high bits
+		TxData_CAN3[6] = EXTRA4 >> 8; //8 low bits
 		
+		//Forth message data
+		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
+		TxData_CAN4[1] = EXTRA5 >> 8; //4 high bits
 		
-		TxData_CAN3[0] = suspotFL & 0x00FF; //8 low bits
-		TxData_CAN3[1] = suspotFL >> 8; //4 high bits
+		TxData_CAN4[2] = EXTRA6 & 0x00FF; //8 low bits
+		TxData_CAN4[3] = EXTRA6 >> 8; //4 high bits
 		
-		TxData_CAN3[2] = suspotFR & 0x00FF; //8 low bits
-		TxData_CAN3[3] = suspotFR >> 8; //4 high bits
-		
-		TxData_CAN3[4] = suspotRL & 0x00FF; //8 low bits
-		TxData_CAN3[5] = suspotRL >> 8; //4 high bits
-		
-		TxData_CAN3[6] = suspotRR & 0x00FF; //8 low bits
-		TxData_CAN3[7] = suspotRR >> 8; //4 high bits
+		TxData_CAN4[4] = EXTRA7 & 0x00FF; //8 low bits
+		TxData_CAN4[5] = EXTRA7 >> 8; //4 high bits
 		
 		HAL_Delay(1);
     /* USER CODE END WHILE */
@@ -692,7 +745,7 @@ static void MX_CAN1_Init(void)
   hcan1.Init.TimeSeg1 = CAN_BS1_3TQ;
   hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
-  hcan1.Init.AutoBusOff = ENABLE;
+  hcan1.Init.AutoBusOff = DISABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
   hcan1.Init.AutoRetransmission = DISABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
@@ -812,8 +865,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_3_Pin
-                          |NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, NTC_PullUp_EN_6_Pin|NTC_PullUp_EN_7_Pin|AD_Buf_VDD_15_Pin, GPIO_PIN_SET);
@@ -821,7 +876,7 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, AD_Buf_VDD_14_Pin|AD_Buf_VDD_13_Pin|AD_Buf_VDD_12_Pin|AD_Buf_VDD_11_Pin
                           |AD_Buf_VDD_10_Pin|AD_Buf_VDD_9_Pin|AD_Buf_VDD_8_Pin|AD_Buf_VDD_7_Pin
-                          |Mux_0_S_Pin|Mux_1_S_Pin|Mux_2_S_Pin|Mux_3_S_Pin, GPIO_PIN_SET);
+                          |Mux_0_S_Pin|Mux_1_S_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, AD_Buf_VDD_6_Pin|AD_Buf_VDD_5_Pin|AD_Buf_VDD_4_Pin|AD_Buf_VDD_3_Pin, GPIO_PIN_SET);
@@ -830,12 +885,17 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOA, AD_Buf_VDD_2_Pin|AD_Buf_VDD_1_Pin|AD_Buf_VDD_0_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOD, GPIO_PIN_6, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOD, Mux_2_S_Pin|Mux_3_S_Pin|GPIO_PIN_6, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : NTC_PullUp_EN_0_Pin NTC_PullUp_EN_1_Pin NTC_PullUp_EN_2_Pin NTC_PullUp_EN_3_Pin
-                           NTC_PullUp_EN_4_Pin NTC_PullUp_EN_5_Pin */
-  GPIO_InitStruct.Pin = NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_3_Pin
-                          |NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin;
+  /*Configure GPIO pins : NTC_PullUp_EN_0_Pin NTC_PullUp_EN_3_Pin */
+  GPIO_InitStruct.Pin = NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : NTC_PullUp_EN_1_Pin NTC_PullUp_EN_2_Pin NTC_PullUp_EN_4_Pin NTC_PullUp_EN_5_Pin */
+  GPIO_InitStruct.Pin = NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -928,13 +988,13 @@ void CanDataTx_CAN(uint16_t STDID)
 
 void ADC_ValueAverage(void){
 	
-	if(tenth_ms1 < averageCount){
+	if(averageCnt_ms < averageCount){
 		averageTemp = averageTemp + AD_DMA[channel];
-		tenth_ms1++;
+		averageCnt_ms++;
 	}
 	else{
 		averageValue[channel] = averageTemp / averageCount;
-		tenth_ms1 = 0;
+		averageCnt_ms = 0;
 		averageTemp = 0;
 		if(channel < 16){
 			channel++;
@@ -966,6 +1026,8 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2)
 	CAN_BUFFER_SIZE = RxHeader1.DLC;
 	CanDataTx_CAN(RxHeader1.StdId);
 	HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, RxData1, &mailbox);
+
+  
 }
 */
 /* USER CODE END 4 */

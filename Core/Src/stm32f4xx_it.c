@@ -245,7 +245,7 @@ void EXTI9_5_IRQHandler(void)
 	}
 	
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
-	rpm_ch3_trig = 0;
+	rpm_ch3_trig=0;
 	}
   /* USER CODE END EXTI9_5_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_3_Pin);
