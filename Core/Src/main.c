@@ -80,6 +80,7 @@ uint16_t ms1 = 0;
 uint16_t ms2 = 0;
 uint16_t ms3 = 0;
 uint16_t ms4 = 0;
+uint16_t whl_spd_deadzone = 650;
 
 uint8_t averageCount = 10;
 volatile uint8_t channel = 0;
@@ -204,13 +205,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			rpm_ch2_ms++;
 			rpm_ch3_ms++;
 		}
-		if(rpm_ch0_ms > 2000)
+		if(rpm_ch0_ms > whl_spd_deadzone)
 			WspdRR = 0;
-		if(rpm_ch1_ms > 2000)
+		if(rpm_ch1_ms > whl_spd_deadzone)
 			WspdRL = 0;
-		if(rpm_ch2_ms > 2000)
+		if(rpm_ch2_ms > whl_spd_deadzone)
 			WspdFR = 0;
-		if(rpm_ch3_ms > 2000)
+		if(rpm_ch3_ms > whl_spd_deadzone)
 			WspdFL = 0;
 	}
 	
@@ -255,14 +256,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(rpm_ch0_trig == 0){
 			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch0_trig = 1;
-			rpm_ch0_ms = 0;
+			rpm_ch0_ms = 0; 
 			
 			if(rpm_ave_count_0 < rpm_count){
 				rpm_ave_01 = rpm_ave_0 + rpm_ave_01;
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
-				WspdRL = rpm_ave_01/rpm_count;
+				WspdRR = rpm_ave_01/rpm_count;
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
