@@ -440,7 +440,7 @@ int main(void)
 		TxData_CAN2[2] = suspotRR & 0x00FF; //8 low bits
 		TxData_CAN2[3] = suspotRR >> 8; //4 high bits
 		
-		//Filter glitches
+		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
 			TxData_CAN2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
 			TxData_CAN2[5] = (uint16_t)WspdRL >> 8; //4 high bits
