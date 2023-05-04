@@ -97,7 +97,7 @@ double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
 double WspdFL = 0;
-uint8_t numOfWhlSpdTrig = 8;
+uint8_t numOfWhlSpdTrig = 16;
 uint16_t suspotRL = 0;
 uint16_t suspotRR = 0;
 uint16_t CoolanttempLower = 0;
@@ -263,7 +263,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
-				WspdRR = rpm_ave_01/rpm_count;
+				WspdRR = ((rpm_ave_01/rpm_count)/60) * 1.477; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
@@ -281,14 +281,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_1++;
 			}
 			if(rpm_ave_count_1 == rpm_count){
-				WspdRR = rpm_ave_11/rpm_count;
+				WspdRL = ((rpm_ave_11/rpm_count)/60) * 1.477; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
 			}
 		}
 	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET){
-	
+		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch2_trig == 0){
 			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch2_trig = 1;
@@ -306,7 +306,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
-		
+		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch3_trig == 0){
 			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/numOfWhlSpdTrig)*60;
 			rpm_ch3_trig = 1;
