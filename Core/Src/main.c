@@ -89,8 +89,8 @@ volatile uint32_t averageValue[16]= {0};
 volatile uint16_t Voltage[16]= {0};
 uint32_t AD_DMA[16] = {0};
 
-uint16_t Vref_5V = 5040;
-uint16_t Rntc[4] = {0};
+uint16_t Vref_5V = 5015;
+uint16_t Rntc[8] = {0};
 
 uint16_t BrakepressRear = 0;
 double WspdRR = 0;
@@ -357,7 +357,7 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CAN1_Init();
-  MX_DMA_Init();
+	MX_DMA_Init();
   MX_ADC1_Init();
   MX_TIM4_Init();
 
@@ -374,7 +374,6 @@ int main(void)
 	HAL_ADC_Start_DMA(&hadc1, AD_DMA, 16);
 	
   //HAL_TIM_IC_Start_IT(&htim10, TIM_CHANNEL_1);
-	
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -389,7 +388,7 @@ int main(void)
 		
 		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
 		
-		suspotRL = Voltage[1] - 1596;
+		suspotRL = Voltage[1];
 		suspotRR = Voltage[2];
 		
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
@@ -416,7 +415,9 @@ int main(void)
 			EXTRA2 = 0;}
 		
 		EXTRA3 = Voltage[3];
-		EXTRA4 = Voltage[12];
+		//EXTRA4 = Voltage[12];
+		Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
+		EXTRA4 = Rntc[2];
 		EXTRA5 = Voltage[13];
 		EXTRA6 = Voltage[14];
 		EXTRA7 = Voltage[15];
@@ -866,10 +867,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin|NTC_PullUp_EN_4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, NTC_PullUp_EN_6_Pin|NTC_PullUp_EN_7_Pin|AD_Buf_VDD_15_Pin, GPIO_PIN_SET);
@@ -888,15 +889,10 @@ static void MX_GPIO_Init(void)
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, Mux_2_S_Pin|Mux_3_S_Pin|GPIO_PIN_6, GPIO_PIN_RESET);
 
-  /*Configure GPIO pins : NTC_PullUp_EN_0_Pin NTC_PullUp_EN_3_Pin */
-  GPIO_InitStruct.Pin = NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
-
-  /*Configure GPIO pins : NTC_PullUp_EN_1_Pin NTC_PullUp_EN_2_Pin NTC_PullUp_EN_4_Pin NTC_PullUp_EN_5_Pin */
-  GPIO_InitStruct.Pin = NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin;
+  /*Configure GPIO pins : NTC_PullUp_EN_0_Pin NTC_PullUp_EN_1_Pin NTC_PullUp_EN_2_Pin NTC_PullUp_EN_3_Pin
+                           NTC_PullUp_EN_4_Pin NTC_PullUp_EN_5_Pin */
+  GPIO_InitStruct.Pin = NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_3_Pin
+                          |NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -907,14 +903,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_OD;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
-  /*Configure GPIO pin : PB13 */
-  GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
-  GPIO_InitStruct.Alternate = GPIO_AF9_CAN2;
   HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
   /*Configure GPIO pin : AD_Buf_VDD_15_Pin */
