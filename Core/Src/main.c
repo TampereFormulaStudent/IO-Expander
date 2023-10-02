@@ -66,10 +66,10 @@ uint32_t TX_ID2 = 95;
 uint32_t TX_ID3 = 404;
 uint32_t TX_ID4 = 888;
 
-uint8_t TxTime1 = 50;
+uint8_t TxTime1 = 10;
 uint8_t TxTime2 = 2;
-uint8_t TxTime3 = 9;
-uint8_t TxTime4 = 11;
+uint8_t TxTime3 = 2;
+uint8_t TxTime4 = 2;
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -89,7 +89,7 @@ volatile uint32_t averageValue[16]= {0};
 volatile uint16_t Voltage[16]= {0};
 uint32_t AD_DMA[16] = {0};
 
-uint16_t Vref_5V = 5015;
+uint16_t Vref_5V = 5040;
 uint16_t Rntc[8] = {0};
 
 uint16_t BrakepressRear = 0;
@@ -170,9 +170,9 @@ bool EXTRA7PU = false;*/
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
-static void MX_CAN1_Init(void);
-static void MX_ADC1_Init(void);
 static void MX_DMA_Init(void);
+static void MX_ADC1_Init(void);
+static void MX_CAN1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
@@ -219,7 +219,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
 		CanDataTx_CAN(TX_ID1);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
+		else{
+			HAL_CAN_AbortTxRequest(&hcan1, 0);
+			HAL_CAN_AbortTxRequest(&hcan1, 1);
+			HAL_CAN_AbortTxRequest(&hcan1, 2);
+		}
 		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN3, &mailbox);
 		
 		ms1 = 0;
@@ -228,27 +234,39 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
 		CanDataTx_CAN(TX_ID2);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN1, &mailbox);
-		
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
+		else{
+			HAL_CAN_AbortTxRequest(&hcan1, 0);
+			HAL_CAN_AbortTxRequest(&hcan1, 1);
+			HAL_CAN_AbortTxRequest(&hcan1, 2);
+		}
 		ms2 = 0;
 	}
 	if(ms3 >= TxTime3)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
 		CanDataTx_CAN(TX_ID3);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_EXTRA1, &mailbox);
-		
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
+		else{
+			HAL_CAN_AbortTxRequest(&hcan1, 0);
+			HAL_CAN_AbortTxRequest(&hcan1, 1);
+			HAL_CAN_AbortTxRequest(&hcan1, 2);
+		}
 		ms3 = 0;
 	}
 	if(ms4 >= TxTime4)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
 		CanDataTx_CAN(TX_ID4);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN4, &mailbox);
-		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_EXTRA2, &mailbox);
-		
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN4, &mailbox);
+		else{
+			HAL_CAN_AbortTxRequest(&hcan1, 0);
+			HAL_CAN_AbortTxRequest(&hcan1, 1);
+			HAL_CAN_AbortTxRequest(&hcan1, 2);
+		}
 		ms4 = 0;
 	}
 	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == SET){
@@ -356,9 +374,9 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_CAN1_Init();
-	MX_DMA_Init();
+  MX_DMA_Init();
   MX_ADC1_Init();
+  MX_CAN1_Init();
   MX_TIM4_Init();
 
   /* Initialize interrupts */
@@ -742,14 +760,14 @@ static void MX_CAN1_Init(void)
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
   hcan1.Init.Prescaler = 7;
-  hcan1.Init.Mode = CAN_MODE_LOOPBACK;
+  hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan1.Init.TimeSeg1 = CAN_BS1_3TQ;
   hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = DISABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = DISABLE;
+  hcan1.Init.AutoRetransmission = ENABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
@@ -763,7 +781,7 @@ sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
 sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
 sFilterConfig.FilterIdHigh = 0xFFFF;
 sFilterConfig.FilterIdLow = 0x0000;
-sFilterConfig.FilterMaskIdHigh = 0x0000;
+sFilterConfig.FilterMaskIdHigh = 0xFFFF;
 sFilterConfig.FilterMaskIdLow = 0x0000;
 sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
 sFilterConfig.FilterActivation = ENABLE;
@@ -816,7 +834,7 @@ static void MX_TIM4_Init(void)
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
   htim4.Init.Period = 1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
-  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
   {
     Error_Handler();
