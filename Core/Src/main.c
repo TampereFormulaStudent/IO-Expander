@@ -66,10 +66,10 @@ uint32_t TX_ID2 = 95;
 uint32_t TX_ID3 = 404;
 uint32_t TX_ID4 = 888;
 
-uint8_t TxTime1 = 10;
+uint8_t TxTime1 = 11;
 uint8_t TxTime2 = 2;
-uint8_t TxTime3 = 2;
-uint8_t TxTime4 = 2;
+uint8_t TxTime3 = 5;
+uint8_t TxTime4 = 7;
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -82,7 +82,7 @@ uint16_t ms3 = 0;
 uint16_t ms4 = 0;
 uint16_t whl_spd_deadzone = 650;
 
-uint8_t averageCount = 10;
+uint8_t averageCount = 5;
 volatile uint8_t channel = 0;
 volatile uint32_t averageTemp = 0;
 volatile uint32_t averageValue[16]= {0};
@@ -281,7 +281,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
-				WspdRR = ((rpm_ave_01/rpm_count)/60) * 1.477; // (2*pi*(tire D/2))*(rpm/60)
+				WspdRR = ((rpm_ave_01/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
@@ -299,7 +299,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_1++;
 			}
 			if(rpm_ave_count_1 == rpm_count){
-				WspdRL = ((rpm_ave_11/rpm_count)/60) * 1.477; // (2*pi*(tire D/2))*(rpm/60)
+				WspdRL = ((rpm_ave_11/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
 			}
@@ -403,6 +403,7 @@ int main(void)
 		}
 		//Voltage[8] = (averageValue[8] * 3300) / 4096;
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
+		Voltage[1] = (averageValue[1] - 1296) * 1.793;
 		
 		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
 		
@@ -454,12 +455,14 @@ int main(void)
 		TxData_CAN1[7] = EXTRA1 >> 8; //4 high bits
 		
 		//Second message data
+		if(suspotRL < 5500){
 		TxData_CAN2[0] = suspotRL & 0x00FF; //8 low bits
 		TxData_CAN2[1] = suspotRL >> 8; //4 high bits
-		
+		}
+		if(suspotRR < 5500){
 		TxData_CAN2[2] = suspotRR & 0x00FF; //8 low bits
 		TxData_CAN2[3] = suspotRR >> 8; //4 high bits
-		
+		}
 		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
 			TxData_CAN2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
