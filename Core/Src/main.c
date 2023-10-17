@@ -117,6 +117,8 @@ uint8_t rpm_ch1_trig = 0;
 uint8_t rpm_ch2_trig = 0;
 uint8_t rpm_ch3_trig = 0;
 
+uint8_t enableRPM[4] = {0};
+
 double rpm_ave_0 = 0;
 double rpm_ave_1 = 0;
 double rpm_ave_2 = 0;
@@ -269,7 +271,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		ms4 = 0;
 	}
-	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_0) == SET){
+	if(enableRPM[0]){
 		
 		if(rpm_ch0_trig == 0){
 			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/numOfWhlSpdTrig)*60;
@@ -287,7 +289,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 		}
 	}
-	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_1) == SET){
+	if(enableRPM[1]){
 		
 		if(rpm_ch1_trig == 0){
 			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/1000))/numOfWhlSpdTrig)*60;
@@ -305,7 +307,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 		}
 	}
-	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET){
+	if(enableRPM[2]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch2_trig == 0){
 			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/numOfWhlSpdTrig)*60;
@@ -323,7 +325,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			}
 		}
 	}
-	if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
+	if(enableRPM[3]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch3_trig == 0){
 			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/numOfWhlSpdTrig)*60;
@@ -396,6 +398,12 @@ int main(void)
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+	//read mux set pins
+	enableRPM[0] = HAL_GPIO_ReadPin(Mux_0_S_GPIO_Port, Mux_0_S_Pin);
+	enableRPM[1] = HAL_GPIO_ReadPin(Mux_1_S_GPIO_Port, Mux_1_S_Pin);
+	enableRPM[2] = HAL_GPIO_ReadPin(Mux_2_S_GPIO_Port, Mux_2_S_Pin);
+	enableRPM[3] = HAL_GPIO_ReadPin(Mux_3_S_GPIO_Port, Mux_3_S_Pin);
+	
   while (1)
   {
     for(int i = 0; i < 16; i++){
@@ -403,7 +411,7 @@ int main(void)
 		}
 		//Voltage[8] = (averageValue[8] * 3300) / 4096;
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
-		Voltage[1] = (averageValue[1] - 1296) * 1.793;
+		Voltage[1] = (averageValue[1] - 1296) * 1.793; //compensate offset from adc channel 1
 		
 		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
 		
@@ -555,7 +563,7 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 }
 
@@ -973,13 +981,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
 }
