@@ -92,6 +92,10 @@ uint32_t AD_DMA[16] = {0};
 uint16_t Vref_5V = 5040;
 uint16_t Rntc[8] = {0};
 
+uint16_t emap_1 = 0;
+uint16_t emap_2 = 0;
+uint16_t map = 0;
+
 uint16_t BrakepressRear = 0;
 double WspdRR = 0;
 double WspdRL = 0;
@@ -423,8 +427,8 @@ int main(void)
 		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
-		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
-		Oilpress = (uint8_t)(0.025*(double)Voltage[10]-12.5);
+		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
+		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
@@ -432,6 +436,7 @@ int main(void)
 		Rntc[1] = ((double)Voltage[11]/((Vref_5V-(double)Voltage[11])/2400))-1000;
 		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
 		
+		/*
 		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
 			EXTRA1 = Voltage[6];}
 		else if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == SET) {
@@ -440,11 +445,21 @@ int main(void)
 			EXTRA2 = Voltage[7];}
 		else if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
 			EXTRA2 = 0;}
+		*/
 		
-		EXTRA3 = Voltage[3];
+		emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
+		EXTRA2 = emap_1;
+		
+		emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
+		EXTRA3 = emap_2;
+		
+		map = (uint16_t)(0.7059*(double)Voltage[12]-0.2824);
+		EXTRA4 = map;
+		
+		//EXTRA3 = Voltage[3];
 		//EXTRA4 = Voltage[12];
-		Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
-		EXTRA4 = Rntc[2];
+		//Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
+		
 		EXTRA5 = Voltage[13];
 		EXTRA6 = Voltage[14];
 		EXTRA7 = Voltage[15];
