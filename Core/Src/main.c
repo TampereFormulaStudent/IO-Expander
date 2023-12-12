@@ -453,7 +453,7 @@ int main(void)
 		emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
 		EXTRA3 = emap_2;
 		
-		map = (uint16_t)(0.7059*(double)Voltage[12]-0.2824);
+		map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
 		EXTRA4 = map;
 		
 		//EXTRA3 = Voltage[3];
