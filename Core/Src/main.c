@@ -67,9 +67,9 @@ uint32_t TX_ID3 = 404;
 uint32_t TX_ID4 = 888;
 
 uint8_t TxTime1 = 11;
-uint8_t TxTime2 = 2;
-uint8_t TxTime3 = 5;
-uint8_t TxTime4 = 7;
+uint8_t TxTime2 = 7;
+uint8_t TxTime3 = 2;
+uint8_t TxTime4 = 5;
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -447,14 +447,14 @@ int main(void)
 			EXTRA2 = 0;}
 		*/
 		
-		emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
-		EXTRA2 = emap_1;
+		//emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
+		EXTRA2 = Voltage[7];
 		
-		emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
-		EXTRA3 = emap_2;
+		//emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
+		EXTRA3 = Voltage[3];
 		
-		map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
-		EXTRA4 = map;
+		//map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
+		EXTRA4 = Voltage[12];
 		
 		//EXTRA3 = Voltage[3];
 		//EXTRA4 = Voltage[12];
@@ -785,11 +785,11 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 7;
+  hcan1.Init.Prescaler = 6;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan1.Init.TimeSeg1 = CAN_BS1_3TQ;
-  hcan1.Init.TimeSeg2 = CAN_BS2_2TQ;
+  hcan1.Init.TimeSeg2 = CAN_BS2_3TQ;
   hcan1.Init.TimeTriggeredMode = DISABLE;
   hcan1.Init.AutoBusOff = DISABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
@@ -911,10 +911,10 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin|NTC_PullUp_EN_4_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_0_Pin|NTC_PullUp_EN_3_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOB, NTC_PullUp_EN_6_Pin|NTC_PullUp_EN_7_Pin|AD_Buf_VDD_15_Pin, GPIO_PIN_SET);
