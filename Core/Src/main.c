@@ -61,15 +61,15 @@ uint8_t TxData_CAN2[8] = {0};
 uint8_t TxData_CAN3[7] = {0};
 uint8_t TxData_CAN4[6] = {0};
 
-uint32_t TX_ID1 = 7;
-uint32_t TX_ID2 = 95;
-uint32_t TX_ID3 = 404;
-uint32_t TX_ID4 = 888;
+uint32_t TX_ID1 = 7; //0x07
+uint32_t TX_ID2 = 95; //0x05F
+uint32_t TX_ID3 = 404; //0x194
+uint32_t TX_ID4 = 888; //0x378
 
-uint8_t TxTime1 = 11;
-uint8_t TxTime2 = 7;
-uint8_t TxTime3 = 2;
-uint8_t TxTime4 = 5;
+uint8_t TxTime1 = 9; //111,1Hz
+uint8_t TxTime2 = 1; //1000Hz
+uint8_t TxTime3 = 3; //333,3Hz
+uint8_t TxTime4 = 5; //200Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -202,7 +202,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(ms25 == 1000){
 			sec++; ms25 = 0;
 		}
-		ADC_ValueAverage();
+		//ADC_ValueAverage();
 		
 		//tenth_ms1++;
 		if(rpm_first == 0){
@@ -366,7 +366,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-
+	HAL_Delay(1000);
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -411,11 +411,11 @@ int main(void)
   while (1)
   {
     for(int i = 0; i < 16; i++){
-			Voltage[i] = (averageValue[i] * 5050) / 4096;
+			Voltage[i] = (AD_DMA[i] * 5050) / 4096;
 		}
 		//Voltage[8] = (averageValue[8] * 3300) / 4096;
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
-		Voltage[1] = (averageValue[1] - 1296) * 1.793; //compensate offset from adc channel 1
+		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
 		
 		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
 		
@@ -623,7 +623,7 @@ static void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
-  sConfig.SamplingTime = ADC_SAMPLETIME_84CYCLES;
+  sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
