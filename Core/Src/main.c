@@ -66,10 +66,10 @@ uint32_t TX_ID2 = 95; //0x05F
 uint32_t TX_ID3 = 404; //0x194
 uint32_t TX_ID4 = 888; //0x378
 
-uint8_t TxTime1 = 9; //111,1Hz
-uint8_t TxTime2 = 1; //1000Hz
-uint8_t TxTime3 = 3; //333,3Hz
-uint8_t TxTime4 = 5; //200Hz
+uint8_t TxTime1 = 7; //142,9Hz
+uint8_t TxTime2 = 2; //5000Hz
+uint8_t TxTime3 = 1; //1000Hz
+uint8_t TxTime4 = 1; //1000Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -89,7 +89,7 @@ volatile uint32_t averageValue[16]= {0};
 volatile uint16_t Voltage[16]= {0};
 uint32_t AD_DMA[16] = {0};
 
-uint16_t Vref_5V = 5040;
+uint16_t Vref_5V = 4998;
 uint16_t Rntc[8] = {0};
 
 uint16_t emap_1 = 0;
@@ -366,7 +366,7 @@ int main(void)
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
   HAL_Init();
-	HAL_Delay(1000);
+
   /* USER CODE BEGIN Init */
 
   /* USER CODE END Init */
@@ -461,7 +461,11 @@ int main(void)
 		//Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
 		
 		EXTRA5 = Voltage[13];
-		EXTRA6 = Voltage[14];
+		
+		//EXTRA6 = Voltage[14];
+		Rntc[2] = ((double)Voltage[14]/((Vref_5V-(double)Voltage[14])/2400))-1000;
+		EXTRA6 = Rntc[2];
+		
 		EXTRA7 = Voltage[15];
 		
 		//First message data
@@ -497,16 +501,17 @@ int main(void)
 		}
 		
 		//Third message data
-		TxData_CAN3[0] = BrakepressRear; //8 low bits
 		
-		TxData_CAN3[1] = EXTRA2 & 0x00FF; //4 high bits
-		TxData_CAN3[2] = EXTRA2 >> 8; //8 low bits
+		TxData_CAN3[0] = EXTRA2 & 0x00FF; //4 high bits
+		TxData_CAN3[1] = EXTRA2 >> 8; //8 low bits
 		
-		TxData_CAN3[3] = EXTRA3 & 0x00FF; //4 high bits
-		TxData_CAN3[4] = EXTRA3 >> 8; //8 low bits
+		TxData_CAN3[2] = EXTRA3 & 0x00FF; //4 high bits
+		TxData_CAN3[3] = EXTRA3 >> 8; //8 low bits
 		
-		TxData_CAN3[5] = EXTRA4 & 0x00FF; //4 high bits
-		TxData_CAN3[6] = EXTRA4 >> 8; //8 low bits
+		TxData_CAN3[4] = EXTRA4 & 0x00FF; //4 high bits
+		TxData_CAN3[5] = EXTRA4 >> 8; //8 low bits
+		
+		TxData_CAN3[6] = BrakepressRear; //8 low bits
 		
 		//Forth message data
 		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
@@ -917,7 +922,10 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_WritePin(GPIOE, NTC_PullUp_EN_1_Pin|NTC_PullUp_EN_2_Pin|NTC_PullUp_EN_4_Pin|NTC_PullUp_EN_5_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, NTC_PullUp_EN_6_Pin|NTC_PullUp_EN_7_Pin|AD_Buf_VDD_15_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(NTC_PullUp_EN_6_GPIO_Port, NTC_PullUp_EN_6_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, NTC_PullUp_EN_7_Pin|AD_Buf_VDD_15_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOD, AD_Buf_VDD_14_Pin|AD_Buf_VDD_13_Pin|AD_Buf_VDD_12_Pin|AD_Buf_VDD_11_Pin
