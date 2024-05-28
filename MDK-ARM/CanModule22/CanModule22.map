@@ -2311,7 +2311,7 @@ Image Symbol Table
     TIM4_IRQHandler                          0x08002841   Thumb Code    12  stm32f4xx_it.o(.text.TIM4_IRQHandler)
     TIM_Base_SetConfig                       0x0800284d   Thumb Code   316  stm32f4xx_hal_tim.o(.text.TIM_Base_SetConfig)
     UsageFault_Handler                       0x08002989   Thumb Code     2  stm32f4xx_it.o(.text.UsageFault_Handler)
-    main                                     0x08002991   Thumb Code  2738  main.o(.text.main)
+    main                                     0x08002991   Thumb Code  2742  main.o(.text.main)
     __hardfp_log                             0x08003449   Thumb Code   872  log.o(i.__hardfp_log)
     __hardfp_round                           0x08003811   Thumb Code   194  round.o(i.__hardfp_round)
     __kernel_poly                            0x080038f1   Thumb Code   248  poly.o(i.__kernel_poly)
@@ -2651,8 +2651,8 @@ Memory Map of the image
     0x0800284c   0x0800284c   0x0000013c   Code   RO          681    .text.TIM_Base_SetConfig  stm32f4xx_hal_tim.o
     0x08002988   0x08002988   0x00000002   Code   RO           60    .text.UsageFault_Handler  stm32f4xx_it.o
     0x0800298a   0x0800298a   0x00000006   PAD
-    0x08002990   0x08002990   0x00000ab2   Code   RO           15    .text.main          main.o
-    0x08003442   0x08003442   0x00000006   PAD
+    0x08002990   0x08002990   0x00000ab6   Code   RO           15    .text.main          main.o
+    0x08003446   0x08003446   0x00000002   PAD
     0x08003448   0x08003448   0x000003c4   Code   RO         1042    i.__hardfp_log      m_wm.l(log.o)
     0x0800380c   0x0800380c   0x00000004   PAD
     0x08003810   0x08003810   0x000000e0   Code   RO         1049    i.__hardfp_round    m_wm.l(round.o)
@@ -2726,7 +2726,7 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   Object Name
 
-      4484        128          0         30        732      20896   main.o
+      4488        128          0         30        732      20898   main.o
         64         26        392          0       1536        888   startup_stm32f407xx.o
        204          0          0          8          4       7342   stm32f4xx_hal.o
       1232          0          0          0          0      12319   stm32f4xx_hal_adc.o
@@ -2743,9 +2743,9 @@ Image component sizes
         18          0         16          4          0       2688   system_stm32f4xx.o
 
     ----------------------------------------------------------------------
-     12396        160        448         44       2276     187133   Object Totals
+     12396        160        448         44       2276     187135   Object Totals
          0          0         32          0          0          0   (incl. Generated)
-       104          0          0          2          4          0   (incl. Padding)
+       100          0          0          2          4          0   (incl. Padding)
 
     ----------------------------------------------------------------------
 
@@ -2819,8 +2819,8 @@ Image component sizes
 
       Code (inc. data)   RO Data    RW Data    ZI Data      Debug   
 
-     17560        526        512         44       2372     189069   Grand Totals
-     17560        526        512         44       2372     189069   ELF Image Totals
+     17560        526        512         44       2372     189071   Grand Totals
+     17560        526        512         44       2372     189071   ELF Image Totals
      17560        526        512         44          0          0   ROM Totals
 
 ==============================================================================

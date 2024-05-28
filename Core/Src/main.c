@@ -523,7 +523,8 @@ int main(void)
 		TxData_CAN3[4] = EXTRA4 & 0x00FF; //4 high bits
 		TxData_CAN3[5] = EXTRA4 >> 8; //8 low bits
 		
-		TxData_CAN3[6] = BrakepressRear; //8 low bits
+		if(BrakepressRear < 200)
+			TxData_CAN3[6] = BrakepressRear; //8 low bits
 		
 		//Forth message data
 		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
