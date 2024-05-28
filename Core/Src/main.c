@@ -429,7 +429,11 @@ int main(void)
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
 		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
 		
-		BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
+		if(Voltage[0] > 500)			
+			BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
+		else
+			BrakepressRear = 0;
+		//BrakepressRear = Voltage[0];
 		
 		suspotRL = Voltage[1];
 		suspotRR = Voltage[2];
