@@ -20,6 +20,7 @@
 "canmodule22\stm32f4xx_hal.o"
 "canmodule22\stm32f4xx_hal_exti.o"
 "canmodule22\stm32f4xx_hal_can.o"
+"canmodule22\stm32f4xx_hal_iwdg.o"
 "canmodule22\stm32f4xx_hal_tim.o"
 "canmodule22\stm32f4xx_hal_tim_ex.o"
 "canmodule22\system_stm32f4xx.o"

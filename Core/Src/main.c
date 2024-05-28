@@ -44,6 +44,8 @@ DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
 
+IWDG_HandleTypeDef hiwdg;
+
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
@@ -180,6 +182,7 @@ static void MX_DMA_Init(void);
 static void MX_ADC1_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TIM4_Init(void);
+static void MX_IWDG_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 void CanDataTx_CAN(uint16_t);
@@ -225,8 +228,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
 		CanDataTx_CAN(TX_ID1);
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
+			HAL_IWDG_Refresh(&hiwdg);
+		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
@@ -240,8 +245,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
 		CanDataTx_CAN(TX_ID2);
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
+			HAL_IWDG_Refresh(&hiwdg);
+		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
@@ -253,8 +260,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
 		CanDataTx_CAN(TX_ID3);
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
+			HAL_IWDG_Refresh(&hiwdg);
+		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
@@ -266,8 +275,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
 		CanDataTx_CAN(TX_ID4);
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0)
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN4, &mailbox);
+			HAL_IWDG_Refresh(&hiwdg);
+		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
@@ -368,14 +379,14 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-	HAL_Delay(1000);
+	
   /* USER CODE END Init */
 
   /* Configure the system clock */
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
-
+	HAL_Delay(2000);
   /* USER CODE END SysInit */
 
   /* Initialize all configured peripherals */
@@ -384,6 +395,7 @@ int main(void)
   MX_ADC1_Init();
   MX_CAN1_Init();
   MX_TIM4_Init();
+  MX_IWDG_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
@@ -548,8 +560,9 @@ void SystemClock_Config(void)
   /** Initializes the RCC Oscillators according to the specified parameters
   * in the RCC_OscInitTypeDef structure.
   */
-  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSE;
+  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_LSI|RCC_OSCILLATORTYPE_HSE;
   RCC_OscInitStruct.HSEState = RCC_HSE_ON;
+  RCC_OscInitStruct.LSIState = RCC_LSI_ON;
   RCC_OscInitStruct.PLL.PLLState = RCC_PLL_ON;
   RCC_OscInitStruct.PLL.PLLSource = RCC_PLLSOURCE_HSE;
   RCC_OscInitStruct.PLL.PLLM = 4;
@@ -839,6 +852,34 @@ if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX
 Error_Handler();
 }
   /* USER CODE END CAN1_Init 2 */
+
+}
+
+/**
+  * @brief IWDG Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_IWDG_Init(void)
+{
+
+  /* USER CODE BEGIN IWDG_Init 0 */
+
+  /* USER CODE END IWDG_Init 0 */
+
+  /* USER CODE BEGIN IWDG_Init 1 */
+
+  /* USER CODE END IWDG_Init 1 */
+  hiwdg.Instance = IWDG;
+  hiwdg.Init.Prescaler = IWDG_PRESCALER_4;
+  hiwdg.Init.Reload = 999;
+  if (HAL_IWDG_Init(&hiwdg) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN IWDG_Init 2 */
+
+  /* USER CODE END IWDG_Init 2 */
 
 }
 
