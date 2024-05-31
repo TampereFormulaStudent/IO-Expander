@@ -43,25 +43,34 @@
 DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
+CAN_HandleTypeDef hcan2;
 
 IWDG_HandleTypeDef hiwdg;
 
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
+// Kommentoikaa joku nyt vittu näitä koodeja
 CAN_RxHeaderTypeDef   RxHeader;
 CAN_RxHeaderTypeDef   RxHeader1;
 uint8_t               RxData[8];
 uint8_t               RxData1[8];
 
 uint8_t CAN_BUFFER_SIZE = 8;
-CAN_TxHeaderTypeDef Tx1Header;
-CAN_TxHeaderTypeDef Tx2Header;
+CAN_TxHeaderTypeDef Tx1Header;	// TX header for CAN1?
+CAN_TxHeaderTypeDef Tx2Header;	// TX header for CAN2
 
-uint8_t TxData_CAN1[8] = {0};
-uint8_t TxData_CAN2[8] = {0};
-uint8_t TxData_CAN3[7] = {0};
-uint8_t TxData_CAN4[6] = {0};
+// TX data buffers CAN1
+uint8_t CAN1_TxData_1[8] = {0};
+uint8_t CAN1_TxData_2[8] = {0};
+uint8_t CAN1_TxData_3[7] = {0};
+uint8_t CAN1_TxData_4[6] = {0};
+
+// TX Data buffers CAN2
+uint8_t CAN2_TxData_1[8] = {0};
+uint8_t CAN2_TxData_2[8] = {0};
+uint8_t CAN2_TxData_3[7] = {0};
+uint8_t CAN2_TxData_4[6] = {0};
 
 uint32_t TX_ID1 = 7; //0x07
 uint32_t TX_ID2 = 95; //0x05F
@@ -74,8 +83,8 @@ uint8_t TxTime3 = 1; //1000Hz
 uint8_t TxTime4 = 1; //1000Hz
 
 CAN_FilterTypeDef sFilterConfig;
-uint32_t mailbox;
-uint32_t mailbox1;
+uint32_t CAN1_mailbox;
+uint32_t CAN2_mailbox;
 
 uint16_t averageCnt_ms = 0;
 uint16_t ms1 = 0;
@@ -183,6 +192,7 @@ static void MX_ADC1_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_IWDG_Init(void);
+static void MX_CAN2_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 void CanDataTx_CAN(uint16_t);
@@ -226,10 +236,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	
 	if(ms1 >= TxTime1)
 	{
-		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
+		CAN_BUFFER_SIZE = sizeof CAN1_TxData_1;
 		CanDataTx_CAN(TX_ID1);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
-			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_1, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
 		}
 		else{
@@ -243,10 +253,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	if(ms2 >= TxTime2)
 	{
-		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
+		CAN_BUFFER_SIZE = sizeof CAN1_TxData_2;
 		CanDataTx_CAN(TX_ID2);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
-			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_2, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
 		}
 		else{
@@ -258,10 +268,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	if(ms3 >= TxTime3)
 	{
-		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
+		CAN_BUFFER_SIZE = sizeof CAN1_TxData_3;
 		CanDataTx_CAN(TX_ID3);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
-			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN3, &mailbox);
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_3, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
 		}
 		else{
@@ -273,10 +283,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 	if(ms4 >= TxTime4)
 	{
-		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
+		CAN_BUFFER_SIZE = sizeof CAN1_TxData_4;
 		CanDataTx_CAN(TX_ID4);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
-			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN4, &mailbox);
+			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_4, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
 		}
 		else{
@@ -396,12 +406,13 @@ int main(void)
   MX_CAN1_Init();
   MX_TIM4_Init();
   MX_IWDG_Init();
+  MX_CAN2_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 	
-	//J�rjestys
+	//J�rjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -485,60 +496,60 @@ int main(void)
 		EXTRA7 = Voltage[15];
 		
 		//First message data
-		TxData_CAN1[0] = Oiltemp;
-		TxData_CAN1[1] = CoolanttempLower;
+		CAN1_TxData_1[0] = Oiltemp;
+		CAN1_TxData_1[1] = CoolanttempLower;
 			
-		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
-		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
+		CAN1_TxData_1[2] = Oilpress & 0x00FF; //8 low bits
+		CAN1_TxData_1[3] = Oilpress >> 8; //4 high bits
 			
-		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
-		TxData_CAN1[5] = Coolantpressure >> 8; //4 high bits
+		CAN1_TxData_1[4] = Coolantpressure & 0x00FF; //8 low bits
+		CAN1_TxData_1[5] = Coolantpressure >> 8; //4 high bits
 			
-		TxData_CAN1[6] = EXTRA1 & 0x00FF; //8 low bits
-		TxData_CAN1[7] = EXTRA1 >> 8; //4 high bits
+		CAN1_TxData_1[6] = EXTRA1 & 0x00FF; //8 low bits
+		CAN1_TxData_1[7] = EXTRA1 >> 8; //4 high bits
 		
 		//Second message data
 		if(suspotRL < 5500){
-		TxData_CAN2[0] = suspotRL & 0x00FF; //8 low bits
-		TxData_CAN2[1] = suspotRL >> 8; //4 high bits
+		CAN1_TxData_2[0] = suspotRL & 0x00FF; //8 low bits
+		CAN1_TxData_2[1] = suspotRL >> 8; //4 high bits
 		}
 		if(suspotRR < 5500){
-		TxData_CAN2[2] = suspotRR & 0x00FF; //8 low bits
-		TxData_CAN2[3] = suspotRR >> 8; //4 high bits
+		CAN1_TxData_2[2] = suspotRR & 0x00FF; //8 low bits
+		CAN1_TxData_2[3] = suspotRR >> 8; //4 high bits
 		}
 		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
-			TxData_CAN2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-			TxData_CAN2[5] = (uint16_t)WspdRL >> 8; //4 high bits
+			CAN1_TxData_2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
+			CAN1_TxData_2[5] = (uint16_t)WspdRL >> 8; //4 high bits
 		}
 		if(WspdRR < 2000){
-			TxData_CAN2[6] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-			TxData_CAN2[7] = (uint16_t)WspdRR >> 8; //4 high bits
+			CAN1_TxData_2[6] = (uint16_t)WspdRR & 0x00FF; //8 low bits
+			CAN1_TxData_2[7] = (uint16_t)WspdRR >> 8; //4 high bits
 		}
 		
 		//Third message data
 		
-		TxData_CAN3[0] = EXTRA2 & 0x00FF; //4 high bits
-		TxData_CAN3[1] = EXTRA2 >> 8; //8 low bits
+		CAN1_TxData_3[0] = EXTRA2 & 0x00FF; //4 high bits
+		CAN1_TxData_3[1] = EXTRA2 >> 8; //8 low bits
 		
-		TxData_CAN3[2] = EXTRA3 & 0x00FF; //4 high bits
-		TxData_CAN3[3] = EXTRA3 >> 8; //8 low bits
+		CAN1_TxData_3[2] = EXTRA3 & 0x00FF; //4 high bits
+		CAN1_TxData_3[3] = EXTRA3 >> 8; //8 low bits
 		
-		TxData_CAN3[4] = EXTRA4 & 0x00FF; //4 high bits
-		TxData_CAN3[5] = EXTRA4 >> 8; //8 low bits
+		CAN1_TxData_3[4] = EXTRA4 & 0x00FF; //4 high bits
+		CAN1_TxData_3[5] = EXTRA4 >> 8; //8 low bits
 		
 		if(BrakepressRear < 200)
-			TxData_CAN3[6] = BrakepressRear; //8 low bits
+			CAN1_TxData_3[6] = BrakepressRear; //8 low bits
 		
 		//Forth message data
-		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
-		TxData_CAN4[1] = EXTRA5 >> 8; //4 high bits
+		CAN1_TxData_4[0] = EXTRA5 & 0x00FF; //8 low bits
+		CAN1_TxData_4[1] = EXTRA5 >> 8; //4 high bits
 		
-		TxData_CAN4[2] = EXTRA6 & 0x00FF; //8 low bits
-		TxData_CAN4[3] = EXTRA6 >> 8; //4 high bits
+		CAN1_TxData_4[2] = EXTRA6 & 0x00FF; //8 low bits
+		CAN1_TxData_4[3] = EXTRA6 >> 8; //4 high bits
 		
-		TxData_CAN4[4] = EXTRA7 & 0x00FF; //8 low bits
-		TxData_CAN4[5] = EXTRA7 >> 8; //4 high bits
+		CAN1_TxData_4[4] = EXTRA7 & 0x00FF; //8 low bits
+		CAN1_TxData_4[5] = EXTRA7 >> 8; //4 high bits
 		
 		HAL_Delay(1);
     /* USER CODE END WHILE */
@@ -857,6 +868,61 @@ if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX
 Error_Handler();
 }
   /* USER CODE END CAN1_Init 2 */
+
+}
+
+/**
+  * @brief CAN2 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_CAN2_Init(void)
+{
+
+  /* USER CODE BEGIN CAN2_Init 0 */
+
+  /* USER CODE END CAN2_Init 0 */
+
+  /* USER CODE BEGIN CAN2_Init 1 */
+
+  /* USER CODE END CAN2_Init 1 */
+	hcan2.Instance = CAN2;
+	hcan2.Init.Prescaler = 3;
+	hcan2.Init.Mode = CAN_MODE_NORMAL;
+	hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
+	hcan2.Init.TimeSeg1 = CAN_BS1_3TQ;
+	hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
+	hcan2.Init.TimeTriggeredMode = DISABLE;
+	hcan2.Init.AutoBusOff = DISABLE;
+	hcan2.Init.AutoWakeUp = DISABLE;
+	hcan2.Init.AutoRetransmission = DISABLE;
+	hcan2.Init.ReceiveFifoLocked = DISABLE;
+	hcan2.Init.TransmitFifoPriority = DISABLE;
+	if (HAL_CAN_Init(&hcan2) != HAL_OK)
+	{
+	Error_Handler();
+	}
+  /* USER CODE BEGIN CAN2_Init 2 */
+
+  // Enable same filter for CAN2 as for CAN1
+	if (HAL_CAN_ConfigFilter(&hcan2, &sFilterConfig) != HAL_OK)
+	{
+		/* Filter configuration Error */
+		Error_Handler();
+	}
+
+	/*##-3- Start the CAN peripheral ###########################################*/
+	if (HAL_CAN_Start(&hcan2) != HAL_OK)
+	{
+		/* Start Error */
+		Error_Handler();
+	}
+
+	if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK){
+		/* Notification Error */
+		Error_Handler();
+	}
+  /* USER CODE END CAN2_Init 2 */
 
 }
 

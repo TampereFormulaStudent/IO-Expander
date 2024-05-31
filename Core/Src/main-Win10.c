@@ -56,13 +56,13 @@ uint8_t               RxData1[8];
 uint8_t CAN_BUFFER_SIZE = 8;
 CAN_TxHeaderTypeDef Tx1Header;
 uint8_t TxData_CAN[2] = {0};
-uint8_t TxData_CAN2[8] = {0};
-uint8_t TxData_CAN3[8] = {0};
+uint8_t CAN1_TxData_2[8] = {0};
+uint8_t CAN1_TxData_3[8] = {0};
 uint32_t TX_ID = 404;
 uint32_t TX_ID2 = 95;
 uint32_t TX_ID3 = 7;
 CAN_FilterTypeDef sFilterConfig;
-uint32_t mailbox;
+uint32_t CAN1_mailbox;
 uint8_t RxTime = 20;
 uint8_t RxTime1 = 19;
 uint16_t tenth_ms = 0;
@@ -185,7 +185,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		
 		CAN_BUFFER_SIZE = 8;
 		CanDataTx_CAN(TX_ID2);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN2, &mailbox);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_2, &CAN1_mailbox);
 		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN2, &mailbox);
 		
 		tenth_ms = 0;
@@ -195,7 +195,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   {
 		CAN_BUFFER_SIZE = 2;
 		CanDataTx_CAN(TX_ID);
-		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN, &mailbox);
+		HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN, &CAN1_mailbox);
 		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN, &mailbox);
 		
 		tenth_ms2 = 0;
@@ -337,7 +337,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 	__HAL_RCC_CAN1_CLK_ENABLE();
 	
-	//Järjestys
+	//Jï¿½rjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -391,30 +391,30 @@ int main(void)
 		
 		
 		
-		TxData_CAN2[0] = (uint16_t) WspdRR & 0x00FF; //8 low bits
-		TxData_CAN2[1] = (uint16_t) WspdRR >> 8; //4 high bits
+		CAN1_TxData_2[0] = (uint16_t) WspdRR & 0x00FF; //8 low bits
+		CAN1_TxData_2[1] = (uint16_t) WspdRR >> 8; //4 high bits
 		
-		TxData_CAN2[2] = (uint16_t) WspdRL & 0x00FF; //8 low bits
-		TxData_CAN2[3] = (uint16_t) WspdRL >> 8; //4 high bits
+		CAN1_TxData_2[2] = (uint16_t) WspdRL & 0x00FF; //8 low bits
+		CAN1_TxData_2[3] = (uint16_t) WspdRL >> 8; //4 high bits
 		
-		TxData_CAN2[4] = (uint16_t) WspdFL & 0x00FF; //8 low bits
-		TxData_CAN2[5] = (uint16_t) WspdFL >> 8; //4 high bits
+		CAN1_TxData_2[4] = (uint16_t) WspdFL & 0x00FF; //8 low bits
+		CAN1_TxData_2[5] = (uint16_t) WspdFL >> 8; //4 high bits
 		
-		TxData_CAN2[6] = (uint16_t) WspdFR & 0x00FF; //8 low bits
-		TxData_CAN2[7] = (uint16_t) WspdFR >> 8; //4 high bits
+		CAN1_TxData_2[6] = (uint16_t) WspdFR & 0x00FF; //8 low bits
+		CAN1_TxData_2[7] = (uint16_t) WspdFR >> 8; //4 high bits
 		
 		
-		TxData_CAN3[0] = suspotFL & 0x00FF; //8 low bits
-		TxData_CAN3[1] = suspotFL >> 8; //4 high bits
+		CAN1_TxData_3[0] = suspotFL & 0x00FF; //8 low bits
+		CAN1_TxData_3[1] = suspotFL >> 8; //4 high bits
 		
-		TxData_CAN3[2] = suspotFR & 0x00FF; //8 low bits
-		TxData_CAN3[3] = suspotFR >> 8; //4 high bits
+		CAN1_TxData_3[2] = suspotFR & 0x00FF; //8 low bits
+		CAN1_TxData_3[3] = suspotFR >> 8; //4 high bits
 		
-		TxData_CAN3[4] = suspotRL & 0x00FF; //8 low bits
-		TxData_CAN3[5] = suspotRL >> 8; //4 high bits
+		CAN1_TxData_3[4] = suspotRL & 0x00FF; //8 low bits
+		CAN1_TxData_3[5] = suspotRL >> 8; //4 high bits
 		
-		TxData_CAN3[6] = suspotRR & 0x00FF; //8 low bits
-		TxData_CAN3[7] = suspotRR >> 8; //4 high bits
+		CAN1_TxData_3[6] = suspotRR & 0x00FF; //8 low bits
+		CAN1_TxData_3[7] = suspotRR >> 8; //4 high bits
 		
 		//HAL_Delay(10);
     /* USER CODE END WHILE */
@@ -1010,7 +1010,7 @@ void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1)
   }
 	CAN_BUFFER_SIZE = RxHeader.DLC;
 	CanDataTx_CAN(RxHeader.StdId);
-		HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, RxData, &mailbox);
+		HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, RxData, &CAN1_mailbox);
 
 }
 
@@ -1022,7 +1022,7 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2)
   }
 	CAN_BUFFER_SIZE = RxHeader1.DLC;
 	CanDataTx_CAN(RxHeader1.StdId);
-	HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, RxData1, &mailbox);
+	HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, RxData1, &CAN1_mailbox);
 
   
 }
