@@ -82,16 +82,20 @@ uint8_t TxTime2 = 2; //5000Hz
 uint8_t TxTime3 = 1; //1000Hz
 uint8_t TxTime4 = 1; //1000Hz
 
+// RX data buffers
 CAN_FilterTypeDef sFilterConfig;
 uint32_t CAN1_mailbox;
 uint32_t CAN2_mailbox;
 
+// Timer variables
 uint16_t averageCnt_ms = 0;
 uint16_t ms1 = 0;
 uint16_t ms2 = 0;
 uint16_t ms3 = 0;
 uint16_t ms4 = 0;
 uint16_t whl_spd_deadzone = 650;
+
+uint16_t CAN2_ms1 = 0;
 
 uint8_t averageCount = 5;
 volatile uint8_t channel = 0;
@@ -212,6 +216,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		ms3++;
 		ms4++;
 		ms25++;
+
+		CAN2_ms1++;
+
 		if(ms25 == 1000){
 			sec++; ms25 = 0;
 		}
@@ -237,7 +244,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(ms1 >= TxTime1)
 	{
 		CAN_BUFFER_SIZE = sizeof CAN1_TxData_1;
-		CanDataTx_CAN(TX_ID1);
+		CanDataTx_CAN(&Tx1Header, TX_ID1); // Construct CAN data header
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_1, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
@@ -254,7 +261,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(ms2 >= TxTime2)
 	{
 		CAN_BUFFER_SIZE = sizeof CAN1_TxData_2;
-		CanDataTx_CAN(TX_ID2);
+		CanDataTx_CAN(&Tx1Header, TX_ID2);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_2, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
@@ -269,7 +276,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(ms3 >= TxTime3)
 	{
 		CAN_BUFFER_SIZE = sizeof CAN1_TxData_3;
-		CanDataTx_CAN(TX_ID3);
+		CanDataTx_CAN(&Tx1Header, TX_ID3);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_3, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
@@ -284,7 +291,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(ms4 >= TxTime4)
 	{
 		CAN_BUFFER_SIZE = sizeof CAN1_TxData_4;
-		CanDataTx_CAN(TX_ID4);
+		CanDataTx_CAN(&Tx1Header, TX_ID4);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_4, &CAN1_mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
@@ -370,6 +377,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 }
 
+// Redirect message from CAN2 to CAN1
+void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2) {
+	if (HAL_CAN_GetRxFifoFillLevel(hcan2, CAN_RX_FIFO1) > 0) {
+		HAL_CAN_GetRxMessage(hcan2, CAN_RX_FIFO1, &RxHeader1, RxData1);
+
+		// check if the message is from the correct ID
+
+		// Redirect message to CAN1
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){ // Check if mailbox is free to transmit, else do nothing
+            HAL_CAN_AddTxMessage(&hcan1, &RxHeader1, RxData1, &CAN1_mailbox);
+			HAL_IWDG_Refresh(&hiwdg);
+		}
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -1128,13 +1149,13 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-void CanDataTx_CAN(uint16_t STDID)
+void CanDataTx_CAN(CAN_TxHeaderTypeDef *header, uint16_t STDID)
 {
-	Tx1Header.StdId = STDID;
-	Tx1Header.IDE = CAN_ID_STD;
-	Tx1Header.RTR = CAN_RTR_DATA;
-	Tx1Header.DLC = CAN_BUFFER_SIZE;
-	Tx1Header.TransmitGlobalTime = DISABLE;
+	header.StdId = STDID;
+	header.IDE = CAN_ID_STD;
+	header.RTR = CAN_RTR_DATA;
+	header.DLC = CAN_BUFFER_SIZE;
+	header.TransmitGlobalTime = DISABLE;
 }
 
 
