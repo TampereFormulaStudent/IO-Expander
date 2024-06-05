@@ -50,14 +50,14 @@ IWDG_HandleTypeDef hiwdg;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
-// Kommentoikaa joku nyt vittu näitä koodeja
+// PLZ kommentoikaa koodit
 CAN_RxHeaderTypeDef   RxHeader;
 CAN_RxHeaderTypeDef   RxHeader1;
 uint8_t               RxData[8];
 uint8_t               RxData1[8];
 
 uint8_t CAN_BUFFER_SIZE = 8;
-CAN_TxHeaderTypeDef Tx1Header;	// TX header for CAN1?
+CAN_TxHeaderTypeDef Tx1Header;	// TX header for CAN1
 CAN_TxHeaderTypeDef Tx2Header;	// TX header for CAN2
 
 // TX data buffers CAN1
@@ -461,29 +461,36 @@ int main(void)
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
 		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
 		
+		// Calculate brake pressure rear
 		if(Voltage[0] > 500)			
 			BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
 		else
 			BrakepressRear = 0;
 		//BrakepressRear = Voltage[0];
 		
+		// Log suspension potentiometers
 		suspotRL = Voltage[1];
 		suspotRR = Voltage[2];
 		
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 		
+		// Get coolant temperature from NTC
 		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
+		// Calculate coolant & oil pressure
 		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
 		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
 		
+		// Get oil temperature from NTC
 		Rntc[1] = ((double)Voltage[11]/((Vref_5V-(double)Voltage[11])/2400))-1000;
 		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
 		
+		// Map extra inputs
+
 		/*
 		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
 			EXTRA1 = Voltage[6];}
@@ -495,12 +502,15 @@ int main(void)
 			EXTRA2 = 0;}
 		*/
 		
+		// Extra1 =
 		//emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
 		EXTRA2 = Voltage[7];
 		
+		// Extra3 =
 		//emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
 		EXTRA3 = Voltage[3];
 		
+		// Extra4 =
 		//map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
 		EXTRA4 = Voltage[12];
 		
@@ -508,15 +518,17 @@ int main(void)
 		//EXTRA4 = Voltage[12];
 		//Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
 		
+		// Extra5 =
 		EXTRA5 = Voltage[13];
 		
+		// Extra6 =
 		//EXTRA6 = Voltage[14];
 		Rntc[2] = ((double)Voltage[14]/((Vref_5V-(double)Voltage[14])/2400))-1000;
 		EXTRA6 = Rntc[2];
 		
 		EXTRA7 = Voltage[15];
 		
-		//First message data
+		// Construct first CAN message: | Oiltemp | CoolanttempLower | Oilpress | Coolantpressure | EXTRA1 |
 		CAN1_TxData_1[0] = Oiltemp;
 		CAN1_TxData_1[1] = CoolanttempLower;
 			
@@ -529,7 +541,7 @@ int main(void)
 		CAN1_TxData_1[6] = EXTRA1 & 0x00FF; //8 low bits
 		CAN1_TxData_1[7] = EXTRA1 >> 8; //4 high bits
 		
-		//Second message data
+		// Construct second CAN message: | suspotRL | suspotRR | WspdRL | WspdRR |
 		if(suspotRL < 5500){
 		CAN1_TxData_2[0] = suspotRL & 0x00FF; //8 low bits
 		CAN1_TxData_2[1] = suspotRL >> 8; //4 high bits
@@ -548,8 +560,7 @@ int main(void)
 			CAN1_TxData_2[7] = (uint16_t)WspdRR >> 8; //4 high bits
 		}
 		
-		//Third message data
-		
+		// Construct third CAN message: | EXTRA2 | EXTRA3 | EXTRA4 | < BrakepressRear<200 > |
 		CAN1_TxData_3[0] = EXTRA2 & 0x00FF; //4 high bits
 		CAN1_TxData_3[1] = EXTRA2 >> 8; //8 low bits
 		
@@ -562,7 +573,8 @@ int main(void)
 		if(BrakepressRear < 200)
 			CAN1_TxData_3[6] = BrakepressRear; //8 low bits
 		
-		//Forth message data
+
+		// Construct fourth CAN message: | EXTRA5 | EXTRA6 | EXTRA7 | < RPM > |
 		CAN1_TxData_4[0] = EXTRA5 & 0x00FF; //8 low bits
 		CAN1_TxData_4[1] = EXTRA5 >> 8; //4 high bits
 		
@@ -857,38 +869,39 @@ static void MX_CAN1_Init(void)
   }
   /* USER CODE BEGIN CAN1_Init 2 */
 	/*##-2- Configure the CAN Filter ###########################################*/
-sFilterConfig.FilterBank = 0;
-sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
-sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
-sFilterConfig.FilterIdHigh = 0xFFFF;
-sFilterConfig.FilterIdLow = 0x0000;
-sFilterConfig.FilterMaskIdHigh = 0xFFFF;
-sFilterConfig.FilterMaskIdLow = 0x0000;
-sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
-sFilterConfig.FilterActivation = ENABLE;
-sFilterConfig.SlaveStartFilterBank = 14;
+	sFilterConfig.FilterBank = 0;
+	sFilterConfig.FilterMode = CAN_FILTERMODE_IDMASK;
+	sFilterConfig.FilterScale = CAN_FILTERSCALE_32BIT;
+	sFilterConfig.FilterIdHigh = 0xFFFF;
+	sFilterConfig.FilterIdLow = 0x0000;
+	sFilterConfig.FilterMaskIdHigh = 0xFFFF;
+	sFilterConfig.FilterMaskIdLow = 0x0000;
+	sFilterConfig.FilterFIFOAssignment = CAN_FILTER_FIFO0;
+	sFilterConfig.FilterActivation = ENABLE;
+	sFilterConfig.SlaveStartFilterBank = 14;
+
+	// Enable filter for CAN1
+	if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
+	{
+		/* Filter configuration Error */
+		Error_Handler();
+	}
 
 
 
-if (HAL_CAN_ConfigFilter(&hcan1, &sFilterConfig) != HAL_OK)
-{
-/* Filter configuration Error */
-Error_Handler();
-}
+	/*##-3- Start the CAN peripheral ###########################################*/
+	if (HAL_CAN_Start(&hcan1) != HAL_OK)
+	{
+		/* Start Error */
+		Error_Handler();
+	}
 
-
-
-/*##-3- Start the CAN peripheral ###########################################*/
-if (HAL_CAN_Start(&hcan1) != HAL_OK)
-{
-/* Start Error */
-Error_Handler();
-}
-if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK){
-/* Notification Error */
-Error_Handler();
-}
-  /* USER CODE END CAN1_Init 2 */
+	// Enable CAN1 interrupt
+	if (HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK){
+		/* Notification Error */
+		Error_Handler();
+	}
+	  /* USER CODE END CAN1_Init 2 */
 
 }
 
@@ -921,11 +934,11 @@ static void MX_CAN2_Init(void)
 	hcan2.Init.TransmitFifoPriority = DISABLE;
 	if (HAL_CAN_Init(&hcan2) != HAL_OK)
 	{
-	Error_Handler();
+		Error_Handler();
 	}
   /* USER CODE BEGIN CAN2_Init 2 */
 
-  // Enable same filter for CAN2 as for CAN1
+	// Enable same filter for CAN2 as for CAN1
 	if (HAL_CAN_ConfigFilter(&hcan2, &sFilterConfig) != HAL_OK)
 	{
 		/* Filter configuration Error */
@@ -939,6 +952,7 @@ static void MX_CAN2_Init(void)
 		Error_Handler();
 	}
 
+	// Enable CAN2 interrupt
 	if (HAL_CAN_ActivateNotification(&hcan2, CAN_IT_RX_FIFO0_MSG_PENDING | CAN_IT_TX_MAILBOX_EMPTY) != HAL_OK){
 		/* Notification Error */
 		Error_Handler();
