@@ -377,17 +377,21 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	}
 }
 
-// Redirect message from CAN2 to CAN1
+// Redirect message from CAN2 to CAN1 at 10Hz
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2) {
+    // Check if message is pending in FIFO1
 	if (HAL_CAN_GetRxFifoFillLevel(hcan2, CAN_RX_FIFO1) > 0) {
+		// Get the message from FIFO1
 		HAL_CAN_GetRxMessage(hcan2, CAN_RX_FIFO1, &RxHeader1, RxData1);
 
-		// check if the message is from the correct ID
-
-		// Redirect message to CAN1
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){ // Check if mailbox is free to transmit, else do nothing
-            HAL_CAN_AddTxMessage(&hcan1, &RxHeader1, RxData1, &CAN1_mailbox);
-			HAL_IWDG_Refresh(&hiwdg);
+		// check time > 100ms, 10Hz
+		if (CAN2_ms1 > 100) {
+			// Redirect message to CAN1
+			if (HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0) { // Check if mailbox is free to transmit, else do nothing
+				HAL_CAN_AddTxMessage(&hcan1, &RxHeader1, RxData1, &CAN1_mailbox);
+				HAL_IWDG_Refresh(&hiwdg);
+			}
+			CAN2_ms1 = 0;
 		}
 	}
 }
