@@ -5,16 +5,34 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.c \
 ../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.c \
-../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.c 
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.c \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.c \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.c \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.c \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.c \
+../Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.c 
 
 OBJS += \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.o \
 ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.o \
-./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.o 
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.o \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.o \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.o \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.o \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.o \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.o 
 
 C_DEPS += \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.d \
 ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.d \
-./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.d 
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.d \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.d \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.d \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.d \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.d \
+./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.d 
 
 
 # Each subdirectory must supply rules for building sources it contributes
@@ -24,7 +42,7 @@ Drivers/CMSIS/NN/Source/SoftmaxFunctions/%.o Drivers/CMSIS/NN/Source/SoftmaxFunc
 clean: clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-SoftmaxFunctions
 
 clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-SoftmaxFunctions:
-	-$(RM) ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.su
+	-$(RM) ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_nn_softmax_common_s8.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q15.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_q7.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s16.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_s8_s16.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_u8.su ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.cyclo ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.d ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.o ./Drivers/CMSIS/NN/Source/SoftmaxFunctions/arm_softmax_with_batch_q7.su
 
 .PHONY: clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-SoftmaxFunctions
 

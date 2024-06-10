@@ -125,6 +125,7 @@ void Error_Handler(void);
 #define MCU_Freq_0_Pin GPIO_PIN_1
 #define MCU_Freq_0_GPIO_Port GPIOE
 #define MCU_Freq_0_EXTI_IRQn EXTI1_IRQn
+
 /* USER CODE BEGIN Private defines */
 
 /* USER CODE END Private defines */

@@ -39,7 +39,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
@@ -61,10 +61,10 @@ CAN_TxHeaderTypeDef Tx1Header;	// TX header for CAN1
 CAN_TxHeaderTypeDef Tx2Header;	// TX header for CAN2
 
 // TX data buffers CAN1
-uint8_t CAN1_TxData_1[8] = {0};
-uint8_t CAN1_TxData_2[8] = {0};
-uint8_t CAN1_TxData_3[7] = {0};
-uint8_t CAN1_TxData_4[6] = {0};
+uint8_t CAN1_TxData_1[8] = {0}; // | Oiltemp  | CoolanttempLower | Oilpress | Coolantpressure        | EXTRA1 |
+uint8_t CAN1_TxData_2[8] = {0}; // | suspotRL | suspotRR         | WspdRL   | WspdRR                 |
+uint8_t CAN1_TxData_3[7] = {0}; // | EXTRA2   | EXTRA3           | EXTRA4   | < BrakepressRear<200 > |
+uint8_t CAN1_TxData_4[6] = {0}; // | EXTRA5   | EXTRA6           | EXTRA7   | < RPM >                |
 
 // TX Data buffers CAN2
 uint8_t CAN2_TxData_1[8] = {0};
@@ -72,10 +72,10 @@ uint8_t CAN2_TxData_2[8] = {0};
 uint8_t CAN2_TxData_3[7] = {0};
 uint8_t CAN2_TxData_4[6] = {0};
 
-uint32_t TX_ID1 = 7; //0x07
-uint32_t TX_ID2 = 95; //0x05F
-uint32_t TX_ID3 = 404; //0x194
-uint32_t TX_ID4 = 888; //0x378
+uint32_t TX_ID1 = 0x1E; // 100Hz
+uint32_t TX_ID2 = 0x1F; // 1000Hz
+uint32_t TX_ID3 = 0x20; // 100Hz
+uint32_t TX_ID4 = 0x21; // 100Hz
 
 uint8_t TxTime1 = 7; //142,9Hz
 uint8_t TxTime2 = 2; //5000Hz
@@ -404,6 +404,7 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2) {
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
 	 //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
   /* USER CODE END 1 */
@@ -533,52 +534,72 @@ int main(void)
 		EXTRA7 = Voltage[15];
 		
 		// Construct first CAN message: | Oiltemp | CoolanttempLower | Oilpress | Coolantpressure | EXTRA1 |
-		CAN1_TxData_1[0] = Oiltemp;
-		CAN1_TxData_1[1] = CoolanttempLower;
-			
+		// rear brake 0-1 tavu
+		// oil pressure 2-3
+		// coolant pressure 4
+		// coolant temp low 5
+		// oil temp 6
+		// io exp mcu temp 7
+
+		if(BrakepressRear < 200){
+			CAN1_TxData_1[0] = BrakepressRear & 0x00FF; //8 low bits
+			CAN1_TxData_1[1] = BrakepressRear >> 8; //4 high bits
+		}
+
 		CAN1_TxData_1[2] = Oilpress & 0x00FF; //8 low bits
 		CAN1_TxData_1[3] = Oilpress >> 8; //4 high bits
-			
-		CAN1_TxData_1[4] = Coolantpressure & 0x00FF; //8 low bits
-		CAN1_TxData_1[5] = Coolantpressure >> 8; //4 high bits
-			
-		CAN1_TxData_1[6] = EXTRA1 & 0x00FF; //8 low bits
-		CAN1_TxData_1[7] = EXTRA1 >> 8; //4 high bits
 		
+		CAN1_TxData_1[4] = (uint8_t)Coolantpressure;
+		CAN1_TxData_1[5] = CoolanttempLower;
+		CAN1_TxData_1[6] = Oiltemp;
+		CAN1_TxData_1[7] = Voltage[4];
+
 		// Construct second CAN message: | suspotRL | suspotRR | WspdRL | WspdRR |
-		if(suspotRL < 5500){
-		CAN1_TxData_2[0] = suspotRL & 0x00FF; //8 low bits
-		CAN1_TxData_2[1] = suspotRL >> 8; //4 high bits
-		}
-		if(suspotRR < 5500){
-		CAN1_TxData_2[2] = suspotRR & 0x00FF; //8 low bits
-		CAN1_TxData_2[3] = suspotRR >> 8; //4 high bits
-		}
+		// Rear left wheel speed 0-1
+		// Rear right wheel speed 2-3
+		// suspot RL 4-5
+		// suspot RR 6-7
+
 		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
-			CAN1_TxData_2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-			CAN1_TxData_2[5] = (uint16_t)WspdRL >> 8; //4 high bits
+			CAN1_TxData_2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
+			CAN1_TxData_2[1] = (uint16_t)WspdRL >> 8; //4 high bits
 		}
 		if(WspdRR < 2000){
-			CAN1_TxData_2[6] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-			CAN1_TxData_2[7] = (uint16_t)WspdRR >> 8; //4 high bits
+			CAN1_TxData_2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
+			CAN1_TxData_2[3] = (uint16_t)WspdRR >> 8; //4 high bits
+		}
+		if(suspotRL < 5500){
+			CAN1_TxData_2[4] = suspotRL & 0x00FF; //8 low bits
+			CAN1_TxData_2[5] = suspotRL >> 8; //4 high bits
+		}
+		if(suspotRR < 5500){
+			CAN1_TxData_2[6] = suspotRR & 0x00FF; //8 low bits
+			CAN1_TxData_2[7] = suspotRR >> 8; //4 high bits
 		}
 		
-		// Construct third CAN message: | EXTRA2 | EXTRA3 | EXTRA4 | < BrakepressRear<200 > |
-		CAN1_TxData_3[0] = EXTRA2 & 0x00FF; //4 high bits
-		CAN1_TxData_3[1] = EXTRA2 >> 8; //8 low bits
+
+		// Construct third CAN message:
+		// Extra 1 0-1
+		// Extra 2 2-3
+		// Extra 3 4-5
+		// Extra 4 6-7
+		CAN1_TxData_3[0] = EXTRA1 & 0x00FF; //4 high bits
+		CAN1_TxData_3[1] = EXTRA1 >> 8; //8 low bits
 		
-		CAN1_TxData_3[2] = EXTRA3 & 0x00FF; //4 high bits
-		CAN1_TxData_3[3] = EXTRA3 >> 8; //8 low bits
+		CAN1_TxData_3[2] = EXTRA2 & 0x00FF; //4 high bits
+		CAN1_TxData_3[3] = EXTRA2 >> 8; //8 low bits
 		
-		CAN1_TxData_3[4] = EXTRA4 & 0x00FF; //4 high bits
-		CAN1_TxData_3[5] = EXTRA4 >> 8; //8 low bits
+		CAN1_TxData_3[4] = EXTRA3 & 0x00FF; //4 high bits
+		CAN1_TxData_3[5] = EXTRA3 >> 8; //8 low bits
 		
-		if(BrakepressRear < 200)
-			CAN1_TxData_3[6] = BrakepressRear; //8 low bits
-		
+		CAN1_TxData_3[6] = EXTRA4 & 0x00FF; //8 low bits
+		CAN1_TxData_3[7] = EXTRA4 >> 8; //4 high bits
 
 		// Construct fourth CAN message: | EXTRA5 | EXTRA6 | EXTRA7 | < RPM > |
+		// Extra 5 0-1
+		// Extra 6 2-3
+		// Extra 7 4-5
 		CAN1_TxData_4[0] = EXTRA5 & 0x00FF; //8 low bits
 		CAN1_TxData_4[1] = EXTRA5 >> 8; //4 high bits
 		
@@ -587,7 +608,7 @@ int main(void)
 		
 		CAN1_TxData_4[4] = EXTRA7 & 0x00FF; //8 low bits
 		CAN1_TxData_4[5] = EXTRA7 >> 8; //4 high bits
-		
+
 		HAL_Delay(1);
     /* USER CODE END WHILE */
 
@@ -905,7 +926,7 @@ static void MX_CAN1_Init(void)
 		/* Notification Error */
 		Error_Handler();
 	}
-	  /* USER CODE END CAN1_Init 2 */
+  /* USER CODE END CAN1_Init 2 */
 
 }
 
@@ -924,22 +945,22 @@ static void MX_CAN2_Init(void)
   /* USER CODE BEGIN CAN2_Init 1 */
 
   /* USER CODE END CAN2_Init 1 */
-	hcan2.Instance = CAN2;
-	hcan2.Init.Prescaler = 3;
-	hcan2.Init.Mode = CAN_MODE_NORMAL;
-	hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
-	hcan2.Init.TimeSeg1 = CAN_BS1_3TQ;
-	hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
-	hcan2.Init.TimeTriggeredMode = DISABLE;
-	hcan2.Init.AutoBusOff = DISABLE;
-	hcan2.Init.AutoWakeUp = DISABLE;
-	hcan2.Init.AutoRetransmission = DISABLE;
-	hcan2.Init.ReceiveFifoLocked = DISABLE;
-	hcan2.Init.TransmitFifoPriority = DISABLE;
-	if (HAL_CAN_Init(&hcan2) != HAL_OK)
-	{
-		Error_Handler();
-	}
+  hcan2.Instance = CAN2;
+  hcan2.Init.Prescaler = 3;
+  hcan2.Init.Mode = CAN_MODE_NORMAL;
+  hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
+  hcan2.Init.TimeSeg1 = CAN_BS1_3TQ;
+  hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
+  hcan2.Init.TimeTriggeredMode = DISABLE;
+  hcan2.Init.AutoBusOff = DISABLE;
+  hcan2.Init.AutoWakeUp = DISABLE;
+  hcan2.Init.AutoRetransmission = DISABLE;
+  hcan2.Init.ReceiveFifoLocked = DISABLE;
+  hcan2.Init.TransmitFifoPriority = DISABLE;
+  if (HAL_CAN_Init(&hcan2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN CAN2_Init 2 */
 
 	// Enable same filter for CAN2 as for CAN1
@@ -1057,6 +1078,8 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
+/* USER CODE BEGIN MX_GPIO_Init_1 */
+/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -1164,6 +1187,8 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
+/* USER CODE BEGIN MX_GPIO_Init_2 */
+/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */

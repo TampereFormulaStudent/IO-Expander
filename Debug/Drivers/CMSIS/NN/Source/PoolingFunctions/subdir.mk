@@ -5,12 +5,24 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS += \
+../Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.c \
+../Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.c \
+../Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.c \
+../Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.c \
 ../Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.c 
 
 OBJS += \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.o \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.o \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.o \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.o \
 ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.o 
 
 C_DEPS += \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.d \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.d \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.d \
+./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.d \
 ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.d 
 
 
@@ -21,7 +33,7 @@ Drivers/CMSIS/NN/Source/PoolingFunctions/%.o Drivers/CMSIS/NN/Source/PoolingFunc
 clean: clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-PoolingFunctions
 
 clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-PoolingFunctions:
-	-$(RM) ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.su
+	-$(RM) ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s16.su ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_avgpool_s8.su ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s16.su ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_max_pool_s8.su ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.cyclo ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.d ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.o ./Drivers/CMSIS/NN/Source/PoolingFunctions/arm_pool_q7_HWC.su
 
 .PHONY: clean-Drivers-2f-CMSIS-2f-NN-2f-Source-2f-PoolingFunctions
 
