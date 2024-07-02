@@ -60,18 +60,18 @@ CAN_TxHeaderTypeDef Tx2Header;
 
 uint8_t TxData_CAN1[8] = {0};
 uint8_t TxData_CAN2[8] = {0};
-uint8_t TxData_CAN3[7] = {0};
+uint8_t TxData_CAN3[8] = {0};
 uint8_t TxData_CAN4[6] = {0};
 
-uint32_t TX_ID1 = 7; //0x07
-uint32_t TX_ID2 = 95; //0x05F
-uint32_t TX_ID3 = 404; //0x194
-uint32_t TX_ID4 = 888; //0x378
+uint32_t TX_ID1 = 30; //0x1E
+uint32_t TX_ID2 = 31; //0x1F
+uint32_t TX_ID3 = 32; //0x20
+uint32_t TX_ID4 = 33; //0x21
 
-uint8_t TxTime1 = 7; //142,9Hz
-uint8_t TxTime2 = 2; //5000Hz
-uint8_t TxTime3 = 1; //1000Hz
-uint8_t TxTime4 = 1; //1000Hz
+uint8_t TxTime1 = 9; //111Hz
+uint8_t TxTime2 = 1; //1000Hz
+uint8_t TxTime3 = 10; //100Hz
+uint8_t TxTime4 = 11; //90Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -430,7 +430,7 @@ int main(void)
 		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
 		
 		if(Voltage[0] > 500)			
-			BrakepressRear = (uint8_t)(0.035*(double)Voltage[0]-17.5);
+			BrakepressRear = (uint16_t)(0.035*(double)Voltage[0]-17.5);
 		else
 			BrakepressRear = 0;
 		//BrakepressRear = Voltage[0];
@@ -441,9 +441,9 @@ int main(void)
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 		
 		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
-		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
+		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
-		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
+		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
 		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
@@ -485,50 +485,54 @@ int main(void)
 		EXTRA7 = Voltage[15];
 		
 		//First message data
-		TxData_CAN1[0] = Oiltemp;
-		TxData_CAN1[1] = CoolanttempLower;
-			
-		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
-		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
-			
-		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
-		TxData_CAN1[5] = Coolantpressure >> 8; //4 high bits
-			
-		TxData_CAN1[6] = EXTRA1 & 0x00FF; //8 low bits
-		TxData_CAN1[7] = EXTRA1 >> 8; //4 high bits
-		
-		//Second message data
-		if(suspotRL < 5500){
-		TxData_CAN2[0] = suspotRL & 0x00FF; //8 low bits
-		TxData_CAN2[1] = suspotRL >> 8; //4 high bits
-		}
-		if(suspotRR < 5500){
-		TxData_CAN2[2] = suspotRR & 0x00FF; //8 low bits
-		TxData_CAN2[3] = suspotRR >> 8; //4 high bits
-		}
-		//Filter glitches from wheel speed
-		if(WspdRL < 2000){
-			TxData_CAN2[4] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-			TxData_CAN2[5] = (uint16_t)WspdRL >> 8; //4 high bits
-		}
-		if(WspdRR < 2000){
-			TxData_CAN2[6] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-			TxData_CAN2[7] = (uint16_t)WspdRR >> 8; //4 high bits
-		}
-		
-		//Third message data
-		
-		TxData_CAN3[0] = EXTRA2 & 0x00FF; //4 high bits
-		TxData_CAN3[1] = EXTRA2 >> 8; //8 low bits
-		
-		TxData_CAN3[2] = EXTRA3 & 0x00FF; //4 high bits
-		TxData_CAN3[3] = EXTRA3 >> 8; //8 low bits
-		
-		TxData_CAN3[4] = EXTRA4 & 0x00FF; //4 high bits
-		TxData_CAN3[5] = EXTRA4 >> 8; //8 low bits
 		
 		if(BrakepressRear < 200)
-			TxData_CAN3[6] = BrakepressRear; //8 low bits
+			TxData_CAN1[0] = BrakepressRear & 0x00FF; //8 low bits
+			TxData_CAN1[1] = BrakepressRear >> 8; //4 high bits
+		
+		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
+		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
+						
+		TxData_CAN1[4] = Coolantpressure;
+		TxData_CAN1[5] = CoolanttempLower;
+					
+		TxData_CAN1[6] = Oiltemp;
+
+		
+		//Second message data
+		
+		//Filter glitches from wheel speed
+		if(WspdRL < 2000){
+			TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
+			TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //4 high bits
+		}
+		if(WspdRR < 2000){
+			TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
+			TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //4 high bits
+		}
+		
+		if(suspotRL < 5500){
+		TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits
+		TxData_CAN2[5] = suspotRL >> 8; //4 high bits
+		}
+		if(suspotRR < 5500){
+		TxData_CAN2[6] = suspotRR & 0x00FF; //8 low bits
+		TxData_CAN2[7] = suspotRR >> 8; //4 high bits
+		}
+
+		//Third message data
+		
+		TxData_CAN3[0] = EXTRA1 & 0x00FF; //8 low bits
+		TxData_CAN3[1] = EXTRA1 >> 8; //4 high bits
+		
+		TxData_CAN3[2] = EXTRA2 & 0x00FF; //4 high bits
+		TxData_CAN3[3] = EXTRA2 >> 8; //8 low bits
+		
+		TxData_CAN3[4] = EXTRA3 & 0x00FF; //4 high bits
+		TxData_CAN3[5] = EXTRA3 >> 8; //8 low bits
+		
+		TxData_CAN3[6] = EXTRA4 & 0x00FF; //4 high bits
+		TxData_CAN3[7] = EXTRA4 >> 8; //8 low bits
 		
 		//Forth message data
 		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
