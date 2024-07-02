@@ -153,22 +153,8 @@ Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/arm \
 Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/gcc \
 Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates/iar \
 Drivers/CMSIS/Device/ST/STM32F4xx/Source/Templates \
-Drivers/CMSIS/NN/NN_Lib_Tests/nn_test/Ref_Implementations \
-Drivers/CMSIS/NN/Source/ActivationFunctions \
-Drivers/CMSIS/NN/Source/BasicMathFunctions \
-Drivers/CMSIS/NN/Source/ConcatenationFunctions \
-Drivers/CMSIS/NN/Source/ConvolutionFunctions \
-Drivers/CMSIS/NN/Source/FullyConnectedFunctions \
-Drivers/CMSIS/NN/Source/NNSupportFunctions \
-Drivers/CMSIS/NN/Source/PoolingFunctions \
-Drivers/CMSIS/NN/Source/ReshapeFunctions \
-Drivers/CMSIS/NN/Source/SVDFunctions \
-Drivers/CMSIS/NN/Source/SoftmaxFunctions \
-Drivers/CMSIS/RTOS2/Source \
-Drivers/CMSIS/RTOS2/Template \
 Drivers/CMSIS \
 Drivers/STM32F4xx_HAL_Driver/Src \
 Drivers/STM32F4xx_HAL_Driver \
 MDK-ARM/CanModule22 \
-MDK-ARM \
 

@@ -39,7 +39,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
+ ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
@@ -199,7 +199,7 @@ static void MX_IWDG_Init(void);
 static void MX_CAN2_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
-void CanDataTx_CAN(uint16_t);
+void CanDataTx_CAN(CAN_TxHeaderTypeDef*, uint16_t);
 void ADC_ValueAverage(void);
 void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan1);
 void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
@@ -247,7 +247,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		CanDataTx_CAN(&Tx1Header, TX_ID1); // Construct CAN data header
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_1, &CAN1_mailbox);
-			HAL_IWDG_Refresh(&hiwdg);
+			if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK)
+			{
+				Error_Handler();
+			}
 		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
@@ -264,7 +267,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		CanDataTx_CAN(&Tx1Header, TX_ID2);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_2, &CAN1_mailbox);
-			HAL_IWDG_Refresh(&hiwdg);
+			if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK)
+			{
+				Error_Handler();
+			}
 		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
@@ -279,7 +285,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		CanDataTx_CAN(&Tx1Header, TX_ID3);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_3, &CAN1_mailbox);
-			HAL_IWDG_Refresh(&hiwdg);
+			if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK)
+			{
+				Error_Handler();
+			}
 		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
@@ -294,7 +303,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		CanDataTx_CAN(&Tx1Header, TX_ID4);
 		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, CAN1_TxData_4, &CAN1_mailbox);
-			HAL_IWDG_Refresh(&hiwdg);
+			if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK)
+			{
+				Error_Handler();
+			}
 		}
 		else{
 			HAL_CAN_AbortTxRequest(&hcan1, 0);
@@ -389,7 +401,10 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2) {
 			// Redirect message to CAN1
 			if (HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0) { // Check if mailbox is free to transmit, else do nothing
 				HAL_CAN_AddTxMessage(&hcan1, &RxHeader1, RxData1, &CAN1_mailbox);
-				HAL_IWDG_Refresh(&hiwdg);
+				if (HAL_IWDG_Refresh(&hiwdg) != HAL_OK)
+				{
+					Error_Handler();
+				}
 			}
 			CAN2_ms1 = 0;
 		}
@@ -404,7 +419,6 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2) {
   */
 int main(void)
 {
-
   /* USER CODE BEGIN 1 */
 	 //HAL_GPIO_WritePin(GPIOA, GPIO_PIN_8, GPIO_PIN_SET);
   /* USER CODE END 1 */
@@ -926,7 +940,7 @@ static void MX_CAN1_Init(void)
 		/* Notification Error */
 		Error_Handler();
 	}
-  /* USER CODE END CAN1_Init 2 */
+	  /* USER CODE END CAN1_Init 2 */
 
 }
 
@@ -945,22 +959,22 @@ static void MX_CAN2_Init(void)
   /* USER CODE BEGIN CAN2_Init 1 */
 
   /* USER CODE END CAN2_Init 1 */
-  hcan2.Instance = CAN2;
-  hcan2.Init.Prescaler = 3;
-  hcan2.Init.Mode = CAN_MODE_NORMAL;
-  hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
-  hcan2.Init.TimeSeg1 = CAN_BS1_3TQ;
-  hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
-  hcan2.Init.TimeTriggeredMode = DISABLE;
-  hcan2.Init.AutoBusOff = DISABLE;
-  hcan2.Init.AutoWakeUp = DISABLE;
-  hcan2.Init.AutoRetransmission = DISABLE;
-  hcan2.Init.ReceiveFifoLocked = DISABLE;
-  hcan2.Init.TransmitFifoPriority = DISABLE;
-  if (HAL_CAN_Init(&hcan2) != HAL_OK)
-  {
-    Error_Handler();
-  }
+	hcan2.Instance = CAN2;
+	hcan2.Init.Prescaler = 3;
+	hcan2.Init.Mode = CAN_MODE_NORMAL;
+	hcan2.Init.SyncJumpWidth = CAN_SJW_1TQ;
+	hcan2.Init.TimeSeg1 = CAN_BS1_3TQ;
+	hcan2.Init.TimeSeg2 = CAN_BS2_3TQ;
+	hcan2.Init.TimeTriggeredMode = DISABLE;
+	hcan2.Init.AutoBusOff = DISABLE;
+	hcan2.Init.AutoWakeUp = DISABLE;
+	hcan2.Init.AutoRetransmission = DISABLE;
+	hcan2.Init.ReceiveFifoLocked = DISABLE;
+	hcan2.Init.TransmitFifoPriority = DISABLE;
+	if (HAL_CAN_Init(&hcan2) != HAL_OK)
+	{
+		Error_Handler();
+	}
   /* USER CODE BEGIN CAN2_Init 2 */
 
 	// Enable same filter for CAN2 as for CAN1
@@ -1078,8 +1092,6 @@ static void MX_DMA_Init(void)
 static void MX_GPIO_Init(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct = {0};
-/* USER CODE BEGIN MX_GPIO_Init_1 */
-/* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOC_CLK_ENABLE();
@@ -1187,8 +1199,6 @@ static void MX_GPIO_Init(void)
   HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
-/* USER CODE BEGIN MX_GPIO_Init_2 */
-/* USER CODE END MX_GPIO_Init_2 */
 }
 
 /* USER CODE BEGIN 4 */
@@ -1258,6 +1268,7 @@ void Error_Handler(void)
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
+  HAL_NVIC_SystemReset();
   while (1)
   {
   }
