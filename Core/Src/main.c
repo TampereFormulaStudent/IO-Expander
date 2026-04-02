@@ -101,9 +101,11 @@ uint16_t map = 0;
 
 uint16_t BrakepressRear = 0;
 
-/**
- * Wheel speed measurements
- */
+/* Wheel speed measurements */
+volatile uint32_t rr_last_timestamp_us = 0;
+volatile uint32_t rr_diff_us = 0;
+volatile uint32_t rl_last_timestamp_us = 0;
+volatile uint32_t rl_diff_us = 0;
 double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
@@ -111,7 +113,6 @@ double WspdFL = 0;
 
 #define NUM_OF_WHLSPD_TRIG      16
 #define WHLSPD_DEADZONE_MS      650
-
 /************************************************/
 
 uint16_t suspotRL = 0;
@@ -202,7 +203,8 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
 
 
 
-/** TODO not enough resolution */
+/** TODO use separate timer for this, TIM4 handles wheel speed measurements */
+
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance==TIM4)
@@ -940,9 +942,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 21000-1;
+  htim4.Init.Prescaler = 42000-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 1;
+  htim4.Init.Period = 65535;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)

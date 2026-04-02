@@ -44,6 +44,11 @@
 /* USER CODE BEGIN PV */
 extern uint8_t rpm_ch2_trig;
 extern uint8_t rpm_ch3_trig;
+
+extern volatile uint32_t rr_last_timestamp_us;
+extern volatile uint32_t rr_diff_us;
+extern volatile uint32_t rl_last_timestamp_us;
+extern volatile uint32_t rl_diff_us;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -203,32 +208,38 @@ void SysTick_Handler(void)
 
 /**
   * @brief This function handles EXTI line0 interrupt.
+  * Rear Right Wheel speed
   */
 void EXTI0_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI0_IRQn 0 */
+  uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
+
+  rr_diff_us = (uint16_t)(now - rr_last_timestamp_us);
+
+  rr_last_timestamp_us = now;
+
   set_whlspd_rr_trig(true);
   car_started_moving();
-  /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
-  /* USER CODE BEGIN EXTI0_IRQn 1 */
 
-  /* USER CODE END EXTI0_IRQn 1 */
 }
 
 /**
   * @brief This function handles EXTI line1 interrupt.
+  * Rear Left Wheel speed
   */
 void EXTI1_IRQHandler(void)
 {
-  /* USER CODE BEGIN EXTI1_IRQn 0 */
+  uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
+
+  rl_diff_us = (uint16_t)(now - rl_last_timestamp_us);
+
+  rl_last_timestamp_us = now;
+
   set_whlspd_rl_trig(true);
   car_started_moving();
-  /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
-  /* USER CODE BEGIN EXTI1_IRQn 1 */
 
-  /* USER CODE END EXTI1_IRQn 1 */
 }
 
 /**
