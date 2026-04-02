@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "stm32f4xx_it.h"
+#include "whlspd.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 /* USER CODE END Includes */
@@ -41,11 +42,8 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-extern uint8_t rpm_ch0_trig;
-extern uint8_t rpm_ch1_trig;
 extern uint8_t rpm_ch2_trig;
 extern uint8_t rpm_ch3_trig;
-extern uint8_t rpm_first;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -209,8 +207,8 @@ void SysTick_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI0_IRQn 0 */
-	rpm_ch0_trig = 0;
-	rpm_first = 0;
+  set_whlspd_rr_trig(true);
+  car_started_moving();
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
@@ -224,8 +222,8 @@ void EXTI0_IRQHandler(void)
 void EXTI1_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI1_IRQn 0 */
- rpm_ch1_trig = 0;
- rpm_first = 0;
+  set_whlspd_rl_trig(true);
+  car_started_moving();
   /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
   /* USER CODE BEGIN EXTI1_IRQn 1 */
@@ -239,7 +237,7 @@ void EXTI1_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-	rpm_first = 0;
+	car_started_moving();
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
 	rpm_ch2_trig = 0;
 	}

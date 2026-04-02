@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "whlspd.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -39,7 +40,7 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
- ADC_HandleTypeDef hadc1;
+ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
@@ -63,35 +64,35 @@ uint8_t TxData_CAN2[8] = {0};
 uint8_t TxData_CAN3[8] = {0};
 uint8_t TxData_CAN4[6] = {0};
 
-uint32_t TX_ID1 = 30; //0x1E
-uint32_t TX_ID2 = 31; //0x1F
-uint32_t TX_ID3 = 32; //0x20
-uint32_t TX_ID4 = 33; //0x21
+#define TX_ID1 30     // 0x1E
+#define TX_ID2 31     // 0X1F
+#define TX_ID3 32     // 0X20
+#define TX_ID4 33     // 0X21
 
-uint8_t TxTime1 = 9; //111Hz
-uint8_t TxTime2 = 1; //1000Hz
-uint8_t TxTime3 = 10; //100Hz
-uint8_t TxTime4 = 11; //90Hz
+#define TX_TIME1 9    // 111Hz
+#define TX_TIME2 1    // 1000Hz
+#define TX_TIME3 10   // 100Hz
+#define TX_TIME4 11   // 90Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
 uint32_t mailbox1;
 
 uint16_t averageCnt_ms = 0;
-uint16_t ms1 = 0;
+uint16_t ms1 = 0;   // no idea what these are for
 uint16_t ms2 = 0;
 uint16_t ms3 = 0;
 uint16_t ms4 = 0;
-uint16_t whl_spd_deadzone = 650;
 
+
+// ADC
 uint8_t averageCount = 5;
 volatile uint8_t channel = 0;
 volatile uint32_t averageTemp = 0;
 volatile uint32_t averageValue[16]= {0};
 volatile uint16_t Voltage[16]= {0};
 uint32_t AD_DMA[16] = {0};
-
-uint16_t Vref_5V = 4998;
+#define V_REF_5V            4998
 uint16_t Rntc[8] = {0};
 
 uint16_t emap_1 = 0;
@@ -99,11 +100,20 @@ uint16_t emap_2 = 0;
 uint16_t map = 0;
 
 uint16_t BrakepressRear = 0;
+
+/**
+ * Wheel speed measurements
+ */
 double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
 double WspdFL = 0;
-uint8_t numOfWhlSpdTrig = 16;
+
+#define NUM_OF_WHLSPD_TRIG      16
+#define WHLSPD_DEADZONE_MS      650
+
+/************************************************/
+
 uint16_t suspotRL = 0;
 uint16_t suspotRR = 0;
 uint16_t CoolanttempLower = 0;
@@ -117,9 +127,6 @@ uint16_t EXTRA4 = 0;
 uint16_t EXTRA5 = 0;
 uint16_t EXTRA6 = 0;
 uint16_t EXTRA7 = 0;
-//Taajuusmittaus
-uint8_t rpm_ch0_trig = 0;
-uint8_t rpm_ch1_trig = 0;
 uint8_t rpm_ch2_trig = 0;
 uint8_t rpm_ch3_trig = 0;
 
@@ -132,7 +139,7 @@ double rpm_ave_3 = 0;
 double rpm_ave_01 = 0;
 double rpm_ave_11 = 0;
 double rpm_ave_21 = 0;
-double rpm_ave_31 = 0;
+double rpm_ave_31 = 0;  // wtf is all this
 uint8_t rpm_count = 5;
 uint8_t rpm_ave_count_0 = 0;
 uint8_t rpm_ave_count_1 = 0;
@@ -140,11 +147,10 @@ uint8_t rpm_ave_count_2 = 0;
 uint8_t rpm_ave_count_3 = 0;
 
 
-uint16_t rpm_ch0_ms = 0;
-uint16_t rpm_ch1_ms = 0;
+uint16_t rr_time_since_prev_plate_ms = 0;
+uint16_t rl_time_since_prev_plate_ms = 0;
 uint16_t rpm_ch2_ms = 0;
 uint16_t rpm_ch3_ms = 0;
-uint8_t rpm_first = 1;
 uint16_t ms25 = 0;
 uint16_t sec = 0;
 /*bool BrakepressRearVD = false;
@@ -193,6 +199,10 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+
+/** TODO not enough resolution */
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance==TIM4)
@@ -208,23 +218,32 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		//ADC_ValueAverage();
 		
 		//tenth_ms1++;
-		if(rpm_first == 0){
-			rpm_ch0_ms++;
-			rpm_ch1_ms++;
+
+    /**
+     * If a plate has passed the sensor, start measuring time to the next plate. 
+     * i.e. the car has started to move. 
+     */
+		if(is_car_moving()){
+			rr_time_since_prev_plate_ms++;
+			rl_time_since_prev_plate_ms++;
 			rpm_ch2_ms++;
 			rpm_ch3_ms++;
 		}
-		if(rpm_ch0_ms > whl_spd_deadzone)
+
+    /**
+     * If no plate has passed the sensor for 650ms, reset wheel speed.
+     */
+		if(rr_time_since_prev_plate_ms > WHLSPD_DEADZONE_MS)
 			WspdRR = 0;
-		if(rpm_ch1_ms > whl_spd_deadzone)
+		if(rl_time_since_prev_plate_ms > WHLSPD_DEADZONE_MS)
 			WspdRL = 0;
-		if(rpm_ch2_ms > whl_spd_deadzone)
+		if(rpm_ch2_ms > WHLSPD_DEADZONE_MS)
 			WspdFR = 0;
-		if(rpm_ch3_ms > whl_spd_deadzone)
+		if(rpm_ch3_ms > WHLSPD_DEADZONE_MS)
 			WspdFL = 0;
 	}
 	
-	if(ms1 >= TxTime1)
+	if(ms1 >= TX_TIME1)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
 		CanDataTx_CAN(TX_ID1);
@@ -241,7 +260,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		
 		ms1 = 0;
 	}
-	if(ms2 >= TxTime2)
+	if(ms2 >= TX_TIME2)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
 		CanDataTx_CAN(TX_ID2);
@@ -256,7 +275,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		ms2 = 0;
 	}
-	if(ms3 >= TxTime3)
+	if(ms3 >= TX_TIME3)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
 		CanDataTx_CAN(TX_ID3);
@@ -271,7 +290,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		ms3 = 0;
 	}
-	if(ms4 >= TxTime4)
+	if(ms4 >= TX_TIME4)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
 		CanDataTx_CAN(TX_ID4);
@@ -286,36 +305,46 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		ms4 = 0;
 	}
+
+  /* calculate Wheel speed Rear Right */
 	if(enableRPM[0]){
 		
-		if(rpm_ch0_trig == 0){
-			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/numOfWhlSpdTrig)*60;
-			rpm_ch0_trig = 1;
-			rpm_ch0_ms = 0; 
+    /**
+     * When the second trigger point (plate) passes the sensor, calculate RPM based
+     * on how much time there was between the triggers.
+     */
+		if(get_whlspd_rr_trig()){
+			rpm_ave_0 = (((double)1/((double)rr_time_since_prev_plate_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			set_whlspd_rr_trig(false);
+			rr_time_since_prev_plate_ms = 0;
 			
 			if(rpm_ave_count_0 < rpm_count){
 				rpm_ave_01 = rpm_ave_0 + rpm_ave_01;
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
+        /* convert RPM to wheel speed (Km/h) */ 
 				WspdRR = ((rpm_ave_01/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
 		}
 	}
+
+  /* calculate Wheel speed Rear Left */
 	if(enableRPM[1]){
 		
-		if(rpm_ch1_trig == 0){
-			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/1000))/numOfWhlSpdTrig)*60;
-			rpm_ch1_trig = 1;
-			rpm_ch1_ms = 0;
+		if(get_whlspd_rl_trig()){
+			rpm_ave_1 = (((double)1/((double)rl_time_since_prev_plate_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			set_whlspd_rl_trig(false);
+			rl_time_since_prev_plate_ms = 0;
 			
 			if(rpm_ave_count_1 < rpm_count){
 				rpm_ave_11 = rpm_ave_1 + rpm_ave_11;
 				rpm_ave_count_1++;
 			}
 			if(rpm_ave_count_1 == rpm_count){
+        /* convert RPM to wheel speed (Km/h) */ 
 				WspdRL = ((rpm_ave_11/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
@@ -325,7 +354,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[2]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch2_trig == 0){
-			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/numOfWhlSpdTrig)*60;
+			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
 			
@@ -343,7 +372,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[3]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch3_trig == 0){
-			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/numOfWhlSpdTrig)*60;
+			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
 		
@@ -401,7 +430,7 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 	
-	//Järjestys
+	//Jï¿½rjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -440,7 +469,7 @@ int main(void)
 		
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 		
-		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
+		Rntc[0] = ((double)Voltage[8]/((V_REF_5V-(double)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
 		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
@@ -449,7 +478,7 @@ int main(void)
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
 		
-		Rntc[1] = ((double)Voltage[11]/((Vref_5V-(double)Voltage[11])/2400))-1000;
+		Rntc[1] = ((double)Voltage[11]/((V_REF_5V-(double)Voltage[11])/2400))-1000;
 		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
 		
 		/*
@@ -474,12 +503,12 @@ int main(void)
 		
 		//EXTRA3 = Voltage[3];
 		//EXTRA4 = Voltage[12];
-		//Rntc[2] = ((double)Voltage[12]/((Vref_5V-(double)Voltage[12])/2400))-1000;
+		//Rntc[2] = ((double)Voltage[12]/((V_REF_5V-(double)Voltage[12])/2400))-1000;
 		
 		EXTRA5 = Voltage[13];
 		
 		//EXTRA6 = Voltage[14];
-		Rntc[2] = ((double)Voltage[14]/((Vref_5V-(double)Voltage[14])/2400))-1000;
+		Rntc[2] = ((double)Voltage[14]/((V_REF_5V-(double)Voltage[14])/2400))-1000;
 		EXTRA6 = Rntc[2];
 		
 		EXTRA7 = Voltage[15];
