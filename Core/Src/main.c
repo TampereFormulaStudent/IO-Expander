@@ -18,10 +18,10 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "whlspd.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+#include "whlspd.h"
 #include "math.h"
 /* USER CODE END Includes */
 
@@ -40,13 +40,14 @@
 /* USER CODE END PM */
 
 /* Private variables ---------------------------------------------------------*/
-ADC_HandleTypeDef hadc1;
+ ADC_HandleTypeDef hadc1;
 DMA_HandleTypeDef hdma_adc1;
 
 CAN_HandleTypeDef hcan1;
 
 IWDG_HandleTypeDef hiwdg;
 
+TIM_HandleTypeDef htim3;
 TIM_HandleTypeDef htim4;
 
 /* USER CODE BEGIN PV */
@@ -69,8 +70,8 @@ uint8_t TxData_CAN4[6] = {0};
 #define TX_ID3 32     // 0X20
 #define TX_ID4 33     // 0X21
 
-#define TX_TIME1 9    // 111Hz
-#define TX_TIME2 1    // 1000Hz
+#define TX_TIME1 9    // 111Hz  change all others to 100hz?
+#define TX_TIME2 1    // 200Hz send suspot data at 200hz
 #define TX_TIME3 10   // 100Hz
 #define TX_TIME4 11   // 90Hz
 
@@ -190,6 +191,7 @@ static void MX_ADC1_Init(void);
 static void MX_CAN1_Init(void);
 static void MX_TIM4_Init(void);
 static void MX_IWDG_Init(void);
+static void MX_TIM3_Init(void);
 static void MX_NVIC_Init(void);
 /* USER CODE BEGIN PFP */
 void CanDataTx_CAN(uint16_t);
@@ -203,11 +205,11 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
 
 
 
-/** TODO use separate timer for this, TIM4 handles wheel speed measurements */
+/** called in 1ms periods, hopefully */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
-	if(htim->Instance==TIM4)
+	if(htim->Instance==TIM3)
 	{
 		ms1++;
 		ms2++;
@@ -249,7 +251,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
 		CanDataTx_CAN(TX_ID1);
-		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){
+		if(HAL_CAN_GetTxMailboxesFreeLevel(&hcan1) != 0){   // https://sourcevu.sysprogs.com/stm32/HAL/symbols/HAL_CAN_AddTxMessage
 			HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, TxData_CAN1, &mailbox);
 			HAL_IWDG_Refresh(&hiwdg);
 		}
@@ -427,12 +429,13 @@ int main(void)
   MX_CAN1_Init();
   MX_TIM4_Init();
   MX_IWDG_Init();
+  MX_TIM3_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 	
-	//J�rjestys
+	//Jörjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -920,6 +923,51 @@ static void MX_IWDG_Init(void)
   /* USER CODE BEGIN IWDG_Init 2 */
 
   /* USER CODE END IWDG_Init 2 */
+
+}
+
+/**
+  * @brief TIM3 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM3_Init(void)
+{
+
+  /* USER CODE BEGIN TIM3_Init 0 */
+
+  /* USER CODE END TIM3_Init 0 */
+
+  TIM_ClockConfigTypeDef sClockSourceConfig = {0};
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM3_Init 1 */
+
+  /* USER CODE END TIM3_Init 1 */
+  htim3.Instance = TIM3;
+  htim3.Init.Prescaler = 42000-1;
+  htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim3.Init.Period = 999;
+  htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sClockSourceConfig.ClockSource = TIM_CLOCKSOURCE_INTERNAL;
+  if (HAL_TIM_ConfigClockSource(&htim3, &sClockSourceConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim3, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM3_Init 2 */
+
+  /* USER CODE END TIM3_Init 2 */
 
 }
 
