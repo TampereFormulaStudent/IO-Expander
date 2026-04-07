@@ -214,15 +214,28 @@ void SysTick_Handler(void)
 void EXTI0_IRQHandler(void)
 {
   uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
+  uint32_t diff;
 
-  rr_diff_us = (uint16_t)(now - rr_last_timestamp_us);
+  // Handle 16-bit timer overflow (Period = 65535)
+  if (now >= rr_last_timestamp_us) {
+    diff = now - rr_last_timestamp_us;
+  } else {
+    // Timer wrapped around, calculate difference accounting for overflow
+    diff = (65535UL - rr_last_timestamp_us) + now + 1;
+  }
 
+  // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
+  if (diff < MIN_PLATE_TIME_US) {
+    HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
+    return;
+  }
+
+  rr_diff_us = diff;
   rr_last_timestamp_us = now;
 
   set_whlspd_rr_trig(true);
   car_started_moving();
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
-
 }
 
 /**
@@ -232,15 +245,28 @@ void EXTI0_IRQHandler(void)
 void EXTI1_IRQHandler(void)
 {
   uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
+  uint32_t diff;
 
-  rl_diff_us = (uint16_t)(now - rl_last_timestamp_us);
+  // Handle 16-bit timer overflow (Period = 65535)
+  if (now >= rl_last_timestamp_us) {
+    diff = now - rl_last_timestamp_us;
+  } else {
+    // Timer wrapped around, calculate difference accounting for overflow
+    diff = (65535UL - rl_last_timestamp_us) + now + 1;
+  }
 
+  // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
+  if (diff < MIN_PLATE_TIME_US) {
+    HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
+    return;
+  }
+
+  rl_diff_us = diff;
   rl_last_timestamp_us = now;
 
   set_whlspd_rl_trig(true);
   car_started_moving();
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
-
 }
 
 /**

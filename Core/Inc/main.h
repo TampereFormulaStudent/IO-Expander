@@ -126,7 +126,7 @@ void Error_Handler(void);
 #define MCU_Freq_0_GPIO_Port GPIOE
 #define MCU_Freq_0_EXTI_IRQn EXTI1_IRQn
 /* USER CODE BEGIN Private defines */
-
+#define MIN_PLATE_TIME_US       1000  // 1ms minimum between plates
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus

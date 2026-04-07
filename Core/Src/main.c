@@ -117,7 +117,6 @@ double WspdFL = 0;
 #define NUM_OF_WHLSPD_TRIG      16
 #define WHLSPD_DEADZONE_MS      650
 #define MAX_WHLSPD_KMH          200
-#define MIN_PLATE_TIME_US       1000  // 1ms minimum between plates
 /************************************************/
 
 uint16_t suspotRL = 0;
@@ -455,6 +454,7 @@ int main(void)
 	
 	//HAL_ADCEx_Calibration_Start(&hadc1);
 	HAL_TIM_Base_Start_IT(&htim4);
+  HAL_TIM_Base_Start_IT(&htim3);
 	HAL_ADC_Start_DMA(&hadc1, AD_DMA, 16);
 	
   //HAL_TIM_IC_Start_IT(&htim10, TIM_CHANNEL_1);
@@ -535,16 +535,19 @@ int main(void)
 		//First message data
 		
 		if(BrakepressRear < 200)
+		{
 			TxData_CAN1[0] = BrakepressRear & 0x00FF; //8 low bits
-			TxData_CAN1[1] = BrakepressRear >> 8; //4 high bits
+			TxData_CAN1[1] = BrakepressRear >> 8; //8 high bits
+		}
 		
 		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
-		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
+		TxData_CAN1[3] = Oilpress >> 8; //8 high bits
 						
-		TxData_CAN1[4] = Coolantpressure;
-		TxData_CAN1[5] = CoolanttempLower;
+		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
+		TxData_CAN1[5] = Coolantpressure >> 8; //8 high bits
 					
-		TxData_CAN1[6] = Oiltemp;
+		TxData_CAN1[6] = CoolanttempLower & 0x00FF; //8 low bits
+		TxData_CAN1[7] = CoolanttempLower >> 8; //8 high bits
 
 		
 		//Second message data
@@ -552,45 +555,45 @@ int main(void)
 		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
 			TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-			TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //4 high bits
+			TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //8 high bits
 		}
 		if(WspdRR < 2000){
 			TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-			TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //4 high bits
+			TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //8 high bits
 		}
 		
 		if(suspotRL < 5500){
-		TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits
-		TxData_CAN2[5] = suspotRL >> 8; //4 high bits
+			TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits
+			TxData_CAN2[5] = suspotRL >> 8; //8 high bits
 		}
 		if(suspotRR < 5500){
-		TxData_CAN2[6] = suspotRR & 0x00FF; //8 low bits
-		TxData_CAN2[7] = suspotRR >> 8; //4 high bits
+			TxData_CAN2[6] = suspotRR & 0x00FF; //8 low bits
+			TxData_CAN2[7] = suspotRR >> 8; //8 high bits
 		}
 
 		//Third message data
 		
 		TxData_CAN3[0] = EXTRA1 & 0x00FF; //8 low bits
-		TxData_CAN3[1] = EXTRA1 >> 8; //4 high bits
+		TxData_CAN3[1] = EXTRA1 >> 8; //8 high bits
 		
-		TxData_CAN3[2] = EXTRA2 & 0x00FF; //4 high bits
-		TxData_CAN3[3] = EXTRA2 >> 8; //8 low bits
+		TxData_CAN3[2] = EXTRA2 & 0x00FF; //8 low bits
+		TxData_CAN3[3] = EXTRA2 >> 8; //8 high bits
 		
-		TxData_CAN3[4] = EXTRA3 & 0x00FF; //4 high bits
-		TxData_CAN3[5] = EXTRA3 >> 8; //8 low bits
+		TxData_CAN3[4] = EXTRA3 & 0x00FF; //8 low bits
+		TxData_CAN3[5] = EXTRA3 >> 8; //8 high bits
 		
-		TxData_CAN3[6] = EXTRA4 & 0x00FF; //4 high bits
-		TxData_CAN3[7] = EXTRA4 >> 8; //8 low bits
+		TxData_CAN3[6] = EXTRA4 & 0x00FF; //8 low bits
+		TxData_CAN3[7] = EXTRA4 >> 8; //8 high bits
 		
-		//Forth message data
+		//Fourth message data
 		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
-		TxData_CAN4[1] = EXTRA5 >> 8; //4 high bits
+		TxData_CAN4[1] = EXTRA5 >> 8; //8 high bits
 		
 		TxData_CAN4[2] = EXTRA6 & 0x00FF; //8 low bits
-		TxData_CAN4[3] = EXTRA6 >> 8; //4 high bits
+		TxData_CAN4[3] = EXTRA6 >> 8; //8 high bits
 		
 		TxData_CAN4[4] = EXTRA7 & 0x00FF; //8 low bits
-		TxData_CAN4[5] = EXTRA7 >> 8; //4 high bits
+		TxData_CAN4[5] = EXTRA7 >> 8; //8 high bits
 		
 		HAL_Delay(1);
     /* USER CODE END WHILE */
@@ -961,7 +964,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 42000-1;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 999;
+  htim3.Init.Period = 0;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
