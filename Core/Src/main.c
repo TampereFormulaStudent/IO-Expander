@@ -70,10 +70,10 @@ uint8_t TxData_CAN4[6] = {0};
 #define TX_ID3 32     // 0X20
 #define TX_ID4 33     // 0X21
 
-#define TX_TIME1 9    // 111Hz  change all others to 100hz?
-#define TX_TIME2 1    // 200Hz send suspot data at 200hz
+#define TX_TIME1 9    // 100Hz  
+#define TX_TIME2 1    // 200Hz, suspot data
 #define TX_TIME3 10   // 100Hz
-#define TX_TIME4 11   // 90Hz
+#define TX_TIME4 11   // 100Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -105,8 +105,10 @@ uint16_t BrakepressRear = 0;
 /* Wheel speed measurements */
 volatile uint32_t rr_last_timestamp_us = 0;
 volatile uint32_t rr_diff_us = 0;
+volatile uint32_t rr_last_pulse_ms = 0;
 volatile uint32_t rl_last_timestamp_us = 0;
 volatile uint32_t rl_diff_us = 0;
+volatile uint32_t rl_last_pulse_ms = 0;
 double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
@@ -114,6 +116,8 @@ double WspdFL = 0;
 
 #define NUM_OF_WHLSPD_TRIG      16
 #define WHLSPD_DEADZONE_MS      650
+#define MAX_WHLSPD_KMH          200
+#define MIN_PLATE_TIME_US       1000  // 1ms minimum between plates
 /************************************************/
 
 uint16_t suspotRL = 0;
@@ -134,19 +138,20 @@ uint8_t rpm_ch3_trig = 0;
 
 uint8_t enableRPM[4] = {0};
 
-double rpm_ave_0 = 0;
-double rpm_ave_1 = 0;
-double rpm_ave_2 = 0;
-double rpm_ave_3 = 0;
-double rpm_ave_01 = 0;
-double rpm_ave_11 = 0;
-double rpm_ave_21 = 0;
-double rpm_ave_31 = 0;  // wtf is all this
-uint8_t rpm_count = 5;
-uint8_t rpm_ave_count_0 = 0;
-uint8_t rpm_ave_count_1 = 0;
-uint8_t rpm_ave_count_2 = 0;
-uint8_t rpm_ave_count_3 = 0;
+/* Wheel speed RPM averaging variables (5-sample window) */
+double rr_rpm = 0;           // Rear Right current RPM
+double rl_rpm = 0;           // Rear Left current RPM
+double fr_rpm = 0;           // Front Right current RPM
+double fl_rpm = 0;           // Front Left current RPM
+double rr_rpm_sum = 0;       // Rear Right accumulated RPM sum
+double rl_rpm_sum = 0;       // Rear Left accumulated RPM sum
+double fr_rpm_sum = 0;       // Front Right accumulated RPM sum
+double fl_rpm_sum = 0;       // Front Left accumulated RPM sum
+#define WHLSPD_SAMPLE_COUNT 5
+uint8_t rr_rpm_sample_count = 0;
+uint8_t rl_rpm_sample_count = 0;
+uint8_t fr_rpm_sample_count = 0;
+uint8_t fl_rpm_sample_count = 0;
 
 
 uint16_t rr_time_since_prev_plate_ms = 0;
@@ -219,27 +224,24 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(ms25 == 1000){
 			sec++; ms25 = 0;
 		}
-		//ADC_ValueAverage();
-		
-		//tenth_ms1++;
 
     /**
-     * If a plate has passed the sensor, start measuring time to the next plate. 
-     * i.e. the car has started to move. 
+     * Track time since last wheel speed pulse. If no pulse detected for
+     * WHLSPD_DEADZONE_MS, reset the speed to zero (car stopped or sensor fault).
      */
 		if(is_car_moving()){
-			rr_time_since_prev_plate_ms++;
-			rl_time_since_prev_plate_ms++;
+			rr_last_pulse_ms++;
+			rl_last_pulse_ms++;
 			rpm_ch2_ms++;
 			rpm_ch3_ms++;
 		}
 
     /**
-     * If no plate has passed the sensor for 650ms, reset wheel speed.
+     * Deadzone timeout: if no wheel speed pulse for 650ms, reset speed to 0.
      */
-		if(rr_time_since_prev_plate_ms > WHLSPD_DEADZONE_MS)
+		if(rr_last_pulse_ms > WHLSPD_DEADZONE_MS)
 			WspdRR = 0;
-		if(rl_time_since_prev_plate_ms > WHLSPD_DEADZONE_MS)
+		if(rl_last_pulse_ms > WHLSPD_DEADZONE_MS)
 			WspdRL = 0;
 		if(rpm_ch2_ms > WHLSPD_DEADZONE_MS)
 			WspdFR = 0;
@@ -314,23 +316,29 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[0]){
 		
     /**
-     * When the second trigger point (plate) passes the sensor, calculate RPM based
-     * on how much time there was between the triggers.
+     * When a new wheel speed pulse is detected, calculate RPM based
+     * on the time difference (in microseconds) since the previous pulse.
      */
-		if(get_whlspd_rr_trig()){
-			rpm_ave_0 = (((double)1/((double)rr_time_since_prev_plate_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+		if(get_whlspd_rr_trig() && rr_diff_us >= MIN_PLATE_TIME_US){
+			// Convert microseconds to milliseconds for RPM calculation
+			double rr_time_ms = (double)rr_diff_us / 1000.0;
+			rr_rpm = (((double)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rr_trig(false);
-			rr_time_since_prev_plate_ms = 0;
+			rr_last_pulse_ms = 0;  // Reset deadzone counter
 			
-			if(rpm_ave_count_0 < rpm_count){
-				rpm_ave_01 = rpm_ave_0 + rpm_ave_01;
-				rpm_ave_count_0++;
+			if(rr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+				rr_rpm_sum = rr_rpm + rr_rpm_sum;
+				rr_rpm_sample_count++;
 			}
-			if(rpm_ave_count_0 == rpm_count){
+			if(rr_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
         /* convert RPM to wheel speed (Km/h) */ 
-				WspdRR = ((rpm_ave_01/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
-				rpm_ave_01 = 0;
-				rpm_ave_count_0 = 0;
+				WspdRR = ((rr_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
+				// Reject spikes 
+				if(WspdRR > MAX_WHLSPD_KMH){
+					WspdRR = 0;
+				}
+				rr_rpm_sum = 0;
+				rr_rpm_sample_count = 0;
 			}
 		}
 	}
@@ -338,20 +346,26 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
   /* calculate Wheel speed Rear Left */
 	if(enableRPM[1]){
 		
-		if(get_whlspd_rl_trig()){
-			rpm_ave_1 = (((double)1/((double)rl_time_since_prev_plate_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+		if(get_whlspd_rl_trig() && rl_diff_us >= MIN_PLATE_TIME_US){
+			// Convert microseconds to milliseconds for RPM calculation
+			double rl_time_ms = (double)rl_diff_us / 1000.0;
+			rl_rpm = (((double)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rl_trig(false);
-			rl_time_since_prev_plate_ms = 0;
+			rl_last_pulse_ms = 0;  // Reset deadzone counter
 			
-			if(rpm_ave_count_1 < rpm_count){
-				rpm_ave_11 = rpm_ave_1 + rpm_ave_11;
-				rpm_ave_count_1++;
+			if(rl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+				rl_rpm_sum = rl_rpm + rl_rpm_sum;
+				rl_rpm_sample_count++;
 			}
-			if(rpm_ave_count_1 == rpm_count){
+			if(rl_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
         /* convert RPM to wheel speed (Km/h) */ 
-				WspdRL = ((rpm_ave_11/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
-				rpm_ave_11 = 0;
-				rpm_ave_count_1 = 0;
+				WspdRL = ((rl_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
+				// Reject spikes
+				if(WspdRL > MAX_WHLSPD_KMH){
+					WspdRL = 0;
+				}
+				rl_rpm_sum = 0;
+				rl_rpm_sample_count = 0;
 			}
 		}
 	}
@@ -362,14 +376,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
 			
-			if(rpm_ave_count_2 < rpm_count){
-				rpm_ave_21 = rpm_ave_2 + rpm_ave_21;
-				rpm_ave_count_2++;
+			if(fr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+				fr_rpm_sum = fr_rpm + fr_rpm_sum;
+				fr_rpm_sample_count++;
 			}
-			if(rpm_ave_count_2 == rpm_count){
-				EXTRA2 = rpm_ave_21/rpm_count;
-				rpm_ave_21 = 0;
-				rpm_ave_count_2 = 0;
+			if(fr_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
+				EXTRA2 = fr_rpm_sum/WHLSPD_SAMPLE_COUNT;
+				fr_rpm_sum = 0;
+				fr_rpm_sample_count = 0;
 			}
 		}
 	}
@@ -380,14 +394,14 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
 		
-			if(rpm_ave_count_3 < rpm_count){
-				rpm_ave_31 = rpm_ave_3 + rpm_ave_31;
-				rpm_ave_count_3++;
+			if(fl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+				fl_rpm_sum = fl_rpm + fl_rpm_sum;
+				fl_rpm_sample_count++;
 			}
-			if(rpm_ave_count_3 == rpm_count){
-				EXTRA1 = rpm_ave_31/rpm_count;
-				rpm_ave_31 = 0;
-				rpm_ave_count_3 = 0;
+			if(fl_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
+				EXTRA1 = fl_rpm_sum/WHLSPD_SAMPLE_COUNT;
+				fl_rpm_sum = 0;
+				fl_rpm_sample_count = 0;
 			}
 		}
 	}
