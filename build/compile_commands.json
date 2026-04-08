@@ -1,0 +1,164 @@
+[
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/CanModule22.dir/Core/Src/main.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/main.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/main.c",
+  "output": "CMakeFiles/CanModule22.dir/Core/Src/main.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/CanModule22.dir/Core/Src/stm32f4xx_it.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/stm32f4xx_it.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/stm32f4xx_it.c",
+  "output": "CMakeFiles/CanModule22.dir/Core/Src/stm32f4xx_it.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/CanModule22.dir/Core/Src/stm32f4xx_hal_msp.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/stm32f4xx_hal_msp.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/stm32f4xx_hal_msp.c",
+  "output": "CMakeFiles/CanModule22.dir/Core/Src/stm32f4xx_hal_msp.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/CanModule22.dir/Core/Src/sysmem.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/sysmem.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/sysmem.c",
+  "output": "CMakeFiles/CanModule22.dir/Core/Src/sysmem.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/CanModule22.dir/Core/Src/syscalls.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/syscalls.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/syscalls.c",
+  "output": "CMakeFiles/CanModule22.dir/Core/Src/syscalls.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -o CMakeFiles/CanModule22.dir/startup_stm32f407xx.s.o -c /home/visa/TUNI/tfs/IO-Expander/startup_stm32f407xx.s",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/startup_stm32f407xx.s",
+  "output": "CMakeFiles/CanModule22.dir/startup_stm32f407xx.s.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.o -c /home/visa/TUNI/tfs/IO-Expander/Core/Src/system_stm32f4xx.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Core/Src/system_stm32f4xx.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Core/Src/system_stm32f4xx.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_adc_ex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_ll_adc.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_rcc_ex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_flash_ramfunc.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_gpio.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma_ex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_dma.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pwr_ex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_cortex.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_exti.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_can.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim.c.o"
+},
+{
+  "directory": "/home/visa/TUNI/tfs/IO-Expander/build/cmake/stm32cubemx",
+  "command": "/usr/bin/cc -DSTM32F407xx -DUSE_HAL_DRIVER -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Core/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Device/ST/STM32F4xx/Include -I/home/visa/TUNI/tfs/IO-Expander/cmake/stm32cubemx/../../Drivers/CMSIS/Include -O3 -DNDEBUG -std=gnu11 -o CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.o -c /home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c",
+  "file": "/home/visa/TUNI/tfs/IO-Expander/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c",
+  "output": "cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir/__/__/Drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_tim_ex.c.o"
+}
+]
