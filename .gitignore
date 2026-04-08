@@ -1,0 +1,36 @@
+# Build directories
+build/
+Release/
+Debug/
+*.map
+
+# Duplicate/unused drivers
+Drivers1/
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.elf
+*.axf
+*.bin
+*.hex
+*.o
+*.d
+*.dep
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# Misc
+mx.scratch
+!.settings
