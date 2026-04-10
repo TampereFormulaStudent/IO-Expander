@@ -60,7 +60,7 @@ uint8_t CAN_BUFFER_SIZE = 8;
 CAN_TxHeaderTypeDef Tx1Header;
 CAN_TxHeaderTypeDef Tx2Header;
 
-uint8_t TxData_CAN1[8] = {0};
+uint8_t TxData_CAN1[10] = {0};
 uint8_t TxData_CAN2[8] = {0};
 uint8_t TxData_CAN3[8] = {0};
 uint8_t TxData_CAN4[6] = {0};
@@ -489,9 +489,9 @@ int main(void)
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 		
 		Rntc[0] = ((double)Voltage[8]/((V_REF_5V-(double)Voltage[8])/2400))-1000;
-		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
+		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
-		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
+		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
 		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
@@ -546,8 +546,11 @@ int main(void)
 		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
 		TxData_CAN1[5] = Coolantpressure >> 8; //8 high bits
 					
-		TxData_CAN1[6] = CoolanttempLower & 0x00FF; //8 low bits
-		TxData_CAN1[7] = CoolanttempLower >> 8; //8 high bits
+		TxData_CAN1[6] = Oiltemp & 0x00FF; //8 low bits
+		TxData_CAN1[7] = Oiltemp >> 8; //8 high bits
+
+    TxData_CAN1[8] = CoolanttempLower & 0x00FF; //8 low bits
+		TxData_CAN1[9] = CoolanttempLower >> 8; //8 high bits
 
 		
 		//Second message data
