@@ -156,6 +156,8 @@ uint16_t rr_time_since_prev_plate_ms = 0;
 uint16_t rl_time_since_prev_plate_ms = 0;
 uint16_t rpm_ch2_ms = 0;
 uint16_t rpm_ch3_ms = 0;
+uint8_t rpm_ch2_trig = 0;
+uint8_t rpm_ch3_trig = 0;
 uint16_t ms25 = 0;
 uint16_t sec = 0;
 /*bool BrakepressRearVD = false;
@@ -659,7 +661,7 @@ void SystemClock_Config(void)
 static void MX_NVIC_Init(void)
 {
   /* DMA2_Stream0_IRQn interrupt configuration */
-  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 1, 0);
+  HAL_NVIC_SetPriority(DMA2_Stream0_IRQn, 7, 0);
   HAL_NVIC_EnableIRQ(DMA2_Stream0_IRQn);
 }
 
@@ -1156,13 +1158,13 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
-  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI0_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI1_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI1_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI1_IRQn);
 
-  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 0, 0);
+  HAL_NVIC_SetPriority(EXTI9_5_IRQn, 6, 0);
   HAL_NVIC_EnableIRQ(EXTI9_5_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
