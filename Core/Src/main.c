@@ -70,20 +70,20 @@ uint8_t TxData_CAN4[6] = {0};
 #define TX_ID3 32     // 0X20
 #define TX_ID4 33     // 0X21
 
-#define TX_TIME1 9    // 100Hz
-#define TX_TIME2 1    // 200Hz, suspot data
+#define TX_TIME1 10   // 100Hz
+#define TX_TIME2 5    // 200Hz, suspot data
 #define TX_TIME3 10   // 100Hz
-#define TX_TIME4 11   // 100Hz
+#define TX_TIME4 10   // 100Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
 uint32_t mailbox1;
 
 uint16_t averageCnt_ms = 0;
-uint16_t ms1 = 0;   // no idea what these are for
-uint16_t ms2 = 0;
-uint16_t ms3 = 0;
-uint16_t ms4 = 0;
+uint16_t CAN1_tx_counter_ms = 0;   // no idea what these are for
+uint16_t CAN2_tx_counter_ms = 0;
+uint16_t CAN3_tx_counter_ms = 0;
+uint16_t CAN4_tx_counter_ms = 0;
 
 uint8_t rpm_ch2_trig = 0;
 uint8_t rpm_ch3_trig = 0;
@@ -111,10 +111,10 @@ volatile uint32_t rr_last_pulse_ms = 0;
 volatile uint32_t rl_last_timestamp_us = 0;
 volatile uint32_t rl_diff_us = 0;
 volatile uint32_t rl_last_pulse_ms = 0;
-double WspdRR = 0;
-double WspdRL = 0;
-double WspdFR = 0;
-double WspdFL = 0;
+float WspdRR = 0;
+float WspdRL = 0;
+float WspdFR = 0;
+float WspdFL = 0;
 
 #define NUM_OF_WHLSPD_TRIG      16
 #define WHLSPD_DEADZONE_MS      650
@@ -139,14 +139,14 @@ uint16_t EXTRA7 = 0;
 uint8_t enableRPM[4] = {0};
 
 /* Wheel speed RPM averaging variables (5-sample window) */
-double rr_rpm = 0;           // Rear Right current RPM
-double rl_rpm = 0;           // Rear Left current RPM
-double fr_rpm = 0;           // Front Right current RPM
-double fl_rpm = 0;           // Front Left current RPM
-double rr_rpm_sum = 0;       // Rear Right accumulated RPM sum
-double rl_rpm_sum = 0;       // Rear Left accumulated RPM sum
-double fr_rpm_sum = 0;       // Front Right accumulated RPM sum
-double fl_rpm_sum = 0;       // Front Left accumulated RPM sum
+float rr_rpm = 0;           // Rear Right current RPM
+float rl_rpm = 0;           // Rear Left current RPM
+float fr_rpm = 0;           // Front Right current RPM
+float fl_rpm = 0;           // Front Left current RPM
+float rr_rpm_sum = 0;       // Rear Right accumulated RPM sum
+float rl_rpm_sum = 0;       // Rear Left accumulated RPM sum
+float fr_rpm_sum = 0;       // Front Right accumulated RPM sum
+float fl_rpm_sum = 0;       // Front Left accumulated RPM sum
 #define WHLSPD_SAMPLE_COUNT 5
 uint8_t rr_rpm_sample_count = 0;
 uint8_t rl_rpm_sample_count = 0;
@@ -158,7 +158,7 @@ uint16_t rr_time_since_prev_plate_ms = 0;
 uint16_t rl_time_since_prev_plate_ms = 0;
 uint16_t rpm_ch2_ms = 0;
 uint16_t rpm_ch3_ms = 0;
-uint16_t ms25 = 0;
+uint16_t time_counter_ms = 0;
 uint16_t sec = 0;
 /*bool BrakepressRearVD = false;
 bool WspdRRMUX = false;
@@ -216,13 +216,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 {
 	if(htim->Instance==TIM3)
 	{
-		ms1++;
-		ms2++;
-		ms3++;
-		ms4++;
-		ms25++;
-		if(ms25 == 1000){
-			sec++; ms25 = 0;
+		CAN1_tx_counter_ms++;
+		CAN2_tx_counter_ms++;
+		CAN3_tx_counter_ms++;
+		CAN4_tx_counter_ms++;
+		time_counter_ms++;
+		if(time_counter_ms == 1000){
+			sec++; time_counter_ms = 0;
 		}
 
     /**
@@ -249,7 +249,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			WspdFL = 0;
 	}
 
-	if(ms1 >= TX_TIME1)
+	if(CAN1_tx_counter_ms >= TX_TIME1)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
 		CanDataTx_CAN(TX_ID1);
@@ -264,9 +264,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		}
 		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN3, &mailbox);
 
-		ms1 = 0;
+		CAN1_tx_counter_ms = 0;
 	}
-	if(ms2 >= TX_TIME2)
+	if(CAN2_tx_counter_ms >= TX_TIME2)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN2;
 		CanDataTx_CAN(TX_ID2);
@@ -279,9 +279,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
 			HAL_CAN_AbortTxRequest(&hcan1, 2);
 		}
-		ms2 = 0;
+		CAN2_tx_counter_ms = 0;
 	}
-	if(ms3 >= TX_TIME3)
+	if(CAN3_tx_counter_ms >= TX_TIME3)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN3;
 		CanDataTx_CAN(TX_ID3);
@@ -294,9 +294,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
 			HAL_CAN_AbortTxRequest(&hcan1, 2);
 		}
-		ms3 = 0;
+		CAN3_tx_counter_ms = 0;
 	}
-	if(ms4 >= TX_TIME4)
+	if(CAN4_tx_counter_ms >= TX_TIME4)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN4;
 		CanDataTx_CAN(TX_ID4);
@@ -309,7 +309,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			HAL_CAN_AbortTxRequest(&hcan1, 1);
 			HAL_CAN_AbortTxRequest(&hcan1, 2);
 		}
-		ms4 = 0;
+		CAN4_tx_counter_ms = 0;
 	}
 
   /* calculate Wheel speed Rear Right */
@@ -321,8 +321,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
      */
 		if(get_whlspd_rr_trig() && rr_diff_us >= MIN_PLATE_TIME_US){
 			// Convert microseconds to milliseconds for RPM calculation
-			double rr_time_ms = (double)rr_diff_us / 1000.0;
-			rr_rpm = (((double)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			float rr_time_ms = (float)rr_diff_us / 1000.0;
+			rr_rpm = (((float)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rr_trig(false);
 			rr_last_pulse_ms = 0;  // Reset deadzone counter
 
@@ -348,8 +348,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
 		if(get_whlspd_rl_trig() && rl_diff_us >= MIN_PLATE_TIME_US){
 			// Convert microseconds to milliseconds for RPM calculation
-			double rl_time_ms = (double)rl_diff_us / 1000.0;
-			rl_rpm = (((double)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			float rl_time_ms = (float)rl_diff_us / 1000.0;
+			rl_rpm = (((float)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rl_trig(false);
 			rl_last_pulse_ms = 0;  // Reset deadzone counter
 
@@ -372,7 +372,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[2]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch2_trig == 0){
-			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			EXTRA2 = (((float)1/((float)rpm_ch2_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
 
@@ -390,7 +390,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[3]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch3_trig == 0){
-			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+			EXTRA1= (((float)1/((float)rpm_ch3_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
 
@@ -481,7 +481,7 @@ int main(void)
 		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
 
 		if(Voltage[0] > 500)
-			BrakepressRear = (uint16_t)(0.035*(double)Voltage[0]-17.5);
+			BrakepressRear = (uint16_t)(0.035*(float)Voltage[0]-17.5);
 		else
 			BrakepressRear = 0;
 		//BrakepressRear = Voltage[0];
@@ -491,16 +491,16 @@ int main(void)
 
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 
-		Rntc[0] = ((double)Voltage[8]/((V_REF_5V-(double)Voltage[8])/2400))-1000;
+		Rntc[0] = ((float)Voltage[8]/((V_REF_5V-(float)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 
-		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
-		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
+		Coolantpressure = (uint16_t)(0.025*(float)Voltage[9]-12.5);
+		Oilpress = (uint16_t)(0.025*(float)Voltage[10]-12.5);
 
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
-		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
+		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((float)Voltage[11]/1000))-3400))+297.61+274.15)/10);
 
-		Rntc[1] = ((double)Voltage[11]/((V_REF_5V-(double)Voltage[11])/2400))-1000;
+		Rntc[1] = ((float)Voltage[11]/((V_REF_5V-(float)Voltage[11])/2400))-1000;
 		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
 
 		/*
@@ -514,23 +514,23 @@ int main(void)
 			EXTRA2 = 0;}
 		*/
 
-		//emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
+		//emap_1 = (uint16_t)(0.025*(float)Voltage[7]-12.5);
 		EXTRA2 = Voltage[7];
 
-		//emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
+		//emap_2 = (uint16_t)(0.025*(float)Voltage[3]-12.5);
 		EXTRA3 = Voltage[3];
 
-		//map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
+		//map = (uint16_t)(0.0706*(float)Voltage[12]-28.235);
 		EXTRA4 = Voltage[12];
 
 		//EXTRA3 = Voltage[3];
 		//EXTRA4 = Voltage[12];
-		//Rntc[2] = ((double)Voltage[12]/((V_REF_5V-(double)Voltage[12])/2400))-1000;
+		//Rntc[2] = ((float)Voltage[12]/((V_REF_5V-(float)Voltage[12])/2400))-1000;
 
 		EXTRA5 = Voltage[13];
 
 		//EXTRA6 = Voltage[14];
-		Rntc[2] = ((double)Voltage[14]/((V_REF_5V-(double)Voltage[14])/2400))-1000;
+		Rntc[2] = ((float)Voltage[14]/((V_REF_5V-(float)Voltage[14])/2400))-1000;
 		EXTRA6 = Rntc[2];
 
 		EXTRA7 = Voltage[15];
