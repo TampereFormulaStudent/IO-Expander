@@ -60,7 +60,7 @@ uint8_t CAN_BUFFER_SIZE = 8;
 CAN_TxHeaderTypeDef Tx1Header;
 CAN_TxHeaderTypeDef Tx2Header;
 
-uint8_t TxData_CAN1[10] = {0};
+uint8_t TxData_CAN1[8] = {0};
 uint8_t TxData_CAN2[8] = {0};
 uint8_t TxData_CAN3[8] = {0};
 uint8_t TxData_CAN4[6] = {0};
@@ -552,10 +552,6 @@ int main(void)
 		TxData_CAN1[6] = Oiltemp & 0x00FF; //8 low bits
 		TxData_CAN1[7] = Oiltemp >> 8; //8 high bits
 
-    TxData_CAN1[8] = CoolanttempLower & 0x00FF; //8 low bits
-		TxData_CAN1[9] = CoolanttempLower >> 8; //8 high bits
-
-
 		//Second message data
 
 		//Filter glitches from wheel speed
@@ -579,8 +575,8 @@ int main(void)
 
 		//Third message data
 
-		TxData_CAN3[0] = EXTRA1 & 0x00FF; //8 low bits
-		TxData_CAN3[1] = EXTRA1 >> 8; //8 high bits
+		TxData_CAN3[0] = CoolanttempLower & 0x00FF; //8 low bits
+		TxData_CAN3[1] = CoolanttempLower >> 8; //8 high bits
 
 		TxData_CAN3[2] = EXTRA2 & 0x00FF; //8 low bits
 		TxData_CAN3[3] = EXTRA2 >> 8; //8 high bits
