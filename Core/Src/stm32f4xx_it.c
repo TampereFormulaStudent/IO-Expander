@@ -279,7 +279,7 @@ void EXTI9_5_IRQHandler(void)
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
 	rpm_ch2_trig = 0;
 	}
-	
+
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_9)){
 	rpm_ch3_trig=0;
 	}

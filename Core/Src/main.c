@@ -70,7 +70,7 @@ uint8_t TxData_CAN4[6] = {0};
 #define TX_ID3 32     // 0X20
 #define TX_ID4 33     // 0X21
 
-#define TX_TIME1 9    // 100Hz  
+#define TX_TIME1 9    // 100Hz
 #define TX_TIME2 1    // 200Hz, suspot data
 #define TX_TIME3 10   // 100Hz
 #define TX_TIME4 11   // 100Hz
@@ -85,6 +85,8 @@ uint16_t ms2 = 0;
 uint16_t ms3 = 0;
 uint16_t ms4 = 0;
 
+uint8_t rpm_ch2_trig = 0;
+uint8_t rpm_ch3_trig = 0;
 
 // ADC
 uint8_t averageCount = 5;
@@ -156,8 +158,6 @@ uint16_t rr_time_since_prev_plate_ms = 0;
 uint16_t rl_time_since_prev_plate_ms = 0;
 uint16_t rpm_ch2_ms = 0;
 uint16_t rpm_ch3_ms = 0;
-uint8_t rpm_ch2_trig = 0;
-uint8_t rpm_ch3_trig = 0;
 uint16_t ms25 = 0;
 uint16_t sec = 0;
 /*bool BrakepressRearVD = false;
@@ -175,7 +175,7 @@ bool CoolanttemplowerPU = false;
 bool CoolantpressureVD = false;
 bool CoolantpressurePU = false;
 bool OilpressVD = false;
-bool OilpressPU = false; 
+bool OilpressPU = false;
 bool oiltempVD = false;
 bool oiltempPU = false;
 bool EXTRA4VD = false;
@@ -248,7 +248,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		if(rpm_ch3_ms > WHLSPD_DEADZONE_MS)
 			WspdFL = 0;
 	}
-	
+
 	if(ms1 >= TX_TIME1)
 	{
 		CAN_BUFFER_SIZE = sizeof TxData_CAN1;
@@ -263,7 +263,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			HAL_CAN_AbortTxRequest(&hcan1, 2);
 		}
 		//HAL_CAN_AddTxMessage(&hcan2, &Tx1Header, TxData_CAN3, &mailbox);
-		
+
 		ms1 = 0;
 	}
 	if(ms2 >= TX_TIME2)
@@ -314,7 +314,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* calculate Wheel speed Rear Right */
 	if(enableRPM[0]){
-		
+
     /**
      * When a new wheel speed pulse is detected, calculate RPM based
      * on the time difference (in microseconds) since the previous pulse.
@@ -325,15 +325,15 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			rr_rpm = (((double)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rr_trig(false);
 			rr_last_pulse_ms = 0;  // Reset deadzone counter
-			
+
 			if(rr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
 				rr_rpm_sum = rr_rpm + rr_rpm_sum;
 				rr_rpm_sample_count++;
 			}
 			if(rr_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
-        /* convert RPM to wheel speed (Km/h) */ 
+        /* convert RPM to wheel speed (Km/h) */
 				WspdRR = ((rr_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
-				// Reject spikes 
+				// Reject spikes
 				if(WspdRR > MAX_WHLSPD_KMH){
 					WspdRR = 0;
 				}
@@ -345,20 +345,20 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* calculate Wheel speed Rear Left */
 	if(enableRPM[1]){
-		
+
 		if(get_whlspd_rl_trig() && rl_diff_us >= MIN_PLATE_TIME_US){
 			// Convert microseconds to milliseconds for RPM calculation
 			double rl_time_ms = (double)rl_diff_us / 1000.0;
 			rl_rpm = (((double)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			set_whlspd_rl_trig(false);
 			rl_last_pulse_ms = 0;  // Reset deadzone counter
-			
+
 			if(rl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
 				rl_rpm_sum = rl_rpm + rl_rpm_sum;
 				rl_rpm_sample_count++;
 			}
 			if(rl_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
-        /* convert RPM to wheel speed (Km/h) */ 
+        /* convert RPM to wheel speed (Km/h) */
 				WspdRL = ((rl_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
 				// Reject spikes
 				if(WspdRL > MAX_WHLSPD_KMH){
@@ -375,7 +375,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
-			
+
 			if(fr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
 				fr_rpm_sum = fr_rpm + fr_rpm_sum;
 				fr_rpm_sample_count++;
@@ -393,7 +393,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
-		
+
 			if(fl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
 				fl_rpm_sum = fl_rpm + fl_rpm_sum;
 				fl_rpm_sample_count++;
@@ -427,7 +427,7 @@ int main(void)
   HAL_Init();
 
   /* USER CODE BEGIN Init */
-	
+
   /* USER CODE END Init */
 
   /* Configure the system clock */
@@ -443,22 +443,23 @@ int main(void)
   MX_ADC1_Init();
   MX_CAN1_Init();
   MX_TIM4_Init();
-  MX_IWDG_Init();
   MX_TIM3_Init();
 
   /* Initialize interrupts */
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
-	
+
 	//Jörjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
-	
+
 	//HAL_ADCEx_Calibration_Start(&hadc1);
 	HAL_TIM_Base_Start_IT(&htim4);
   HAL_TIM_Base_Start_IT(&htim3);
 	HAL_ADC_Start_DMA(&hadc1, AD_DMA, 16);
-	
+
+	MX_IWDG_Init();
+
   //HAL_TIM_IC_Start_IT(&htim10, TIM_CHANNEL_1);
   /* USER CODE END 2 */
 
@@ -469,7 +470,7 @@ int main(void)
 	enableRPM[1] = HAL_GPIO_ReadPin(Mux_1_S_GPIO_Port, Mux_1_S_Pin);
 	enableRPM[2] = HAL_GPIO_ReadPin(Mux_2_S_GPIO_Port, Mux_2_S_Pin);
 	enableRPM[3] = HAL_GPIO_ReadPin(Mux_3_S_GPIO_Port, Mux_3_S_Pin);
-	
+
   while (1)
   {
     for(int i = 0; i < 16; i++){
@@ -478,30 +479,30 @@ int main(void)
 		//Voltage[8] = (averageValue[8] * 3300) / 4096;
 		//Voltage[11] = (averageValue[11] * 3300) / 4096;
 		Voltage[1] = (AD_DMA[1] - 1296) * 1.793; //compensate offset from adc channel 1
-		
-		if(Voltage[0] > 500)			
+
+		if(Voltage[0] > 500)
 			BrakepressRear = (uint16_t)(0.035*(double)Voltage[0]-17.5);
 		else
 			BrakepressRear = 0;
 		//BrakepressRear = Voltage[0];
-		
+
 		suspotRL = Voltage[1];
 		suspotRR = Voltage[2];
-		
+
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
-		
+
 		Rntc[0] = ((double)Voltage[8]/((V_REF_5V-(double)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
-		
+
 		Coolantpressure = (uint16_t)(0.025*(double)Voltage[9]-12.5);
 		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
-		
+
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
-		
+
 		Rntc[1] = ((double)Voltage[11]/((V_REF_5V-(double)Voltage[11])/2400))-1000;
 		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
-		
+
 		/*
 		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
 			EXTRA1 = Voltage[6];}
@@ -512,51 +513,51 @@ int main(void)
 		else if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_3) == SET){
 			EXTRA2 = 0;}
 		*/
-		
+
 		//emap_1 = (uint16_t)(0.025*(double)Voltage[7]-12.5);
 		EXTRA2 = Voltage[7];
-		
+
 		//emap_2 = (uint16_t)(0.025*(double)Voltage[3]-12.5);
 		EXTRA3 = Voltage[3];
-		
+
 		//map = (uint16_t)(0.0706*(double)Voltage[12]-28.235);
 		EXTRA4 = Voltage[12];
-		
+
 		//EXTRA3 = Voltage[3];
 		//EXTRA4 = Voltage[12];
 		//Rntc[2] = ((double)Voltage[12]/((V_REF_5V-(double)Voltage[12])/2400))-1000;
-		
+
 		EXTRA5 = Voltage[13];
-		
+
 		//EXTRA6 = Voltage[14];
 		Rntc[2] = ((double)Voltage[14]/((V_REF_5V-(double)Voltage[14])/2400))-1000;
 		EXTRA6 = Rntc[2];
-		
+
 		EXTRA7 = Voltage[15];
-		
+
 		//First message data
-		
+
 		if(BrakepressRear < 200)
 		{
 			TxData_CAN1[0] = BrakepressRear & 0x00FF; //8 low bits
 			TxData_CAN1[1] = BrakepressRear >> 8; //8 high bits
 		}
-		
+
 		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
 		TxData_CAN1[3] = Oilpress >> 8; //8 high bits
-						
+
 		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
 		TxData_CAN1[5] = Coolantpressure >> 8; //8 high bits
-					
+
 		TxData_CAN1[6] = Oiltemp & 0x00FF; //8 low bits
 		TxData_CAN1[7] = Oiltemp >> 8; //8 high bits
 
     TxData_CAN1[8] = CoolanttempLower & 0x00FF; //8 low bits
 		TxData_CAN1[9] = CoolanttempLower >> 8; //8 high bits
 
-		
+
 		//Second message data
-		
+
 		//Filter glitches from wheel speed
 		if(WspdRL < 2000){
 			TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
@@ -566,7 +567,7 @@ int main(void)
 			TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
 			TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //8 high bits
 		}
-		
+
 		if(suspotRL < 5500){
 			TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits
 			TxData_CAN2[5] = suspotRL >> 8; //8 high bits
@@ -577,29 +578,29 @@ int main(void)
 		}
 
 		//Third message data
-		
+
 		TxData_CAN3[0] = EXTRA1 & 0x00FF; //8 low bits
 		TxData_CAN3[1] = EXTRA1 >> 8; //8 high bits
-		
+
 		TxData_CAN3[2] = EXTRA2 & 0x00FF; //8 low bits
 		TxData_CAN3[3] = EXTRA2 >> 8; //8 high bits
-		
+
 		TxData_CAN3[4] = EXTRA3 & 0x00FF; //8 low bits
 		TxData_CAN3[5] = EXTRA3 >> 8; //8 high bits
-		
+
 		TxData_CAN3[6] = EXTRA4 & 0x00FF; //8 low bits
 		TxData_CAN3[7] = EXTRA4 >> 8; //8 high bits
-		
+
 		//Fourth message data
 		TxData_CAN4[0] = EXTRA5 & 0x00FF; //8 low bits
 		TxData_CAN4[1] = EXTRA5 >> 8; //8 high bits
-		
+
 		TxData_CAN4[2] = EXTRA6 & 0x00FF; //8 low bits
 		TxData_CAN4[3] = EXTRA6 >> 8; //8 high bits
-		
+
 		TxData_CAN4[4] = EXTRA7 & 0x00FF; //8 low bits
 		TxData_CAN4[5] = EXTRA7 >> 8; //8 high bits
-		
+
 		HAL_Delay(1);
     /* USER CODE END WHILE */
 
@@ -969,7 +970,7 @@ static void MX_TIM3_Init(void)
   htim3.Instance = TIM3;
   htim3.Init.Prescaler = 42000-1;
   htim3.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim3.Init.Period = 0;
+  htim3.Init.Period = 2-1;
   htim3.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim3.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim3) != HAL_OK)
@@ -1014,7 +1015,7 @@ static void MX_TIM4_Init(void)
   htim4.Instance = TIM4;
   htim4.Init.Prescaler = 42000-1;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 65535;
+  htim4.Init.Period = 65535-1;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)
@@ -1185,7 +1186,7 @@ void CanDataTx_CAN(uint16_t STDID)
 
 
 void ADC_ValueAverage(void){
-	
+
 	if(averageCnt_ms < averageCount){
 		averageTemp = averageTemp + AD_DMA[channel];
 		averageCnt_ms++;
@@ -1225,7 +1226,7 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2)
 	CanDataTx_CAN(RxHeader1.StdId);
 	HAL_CAN_AddTxMessage(&hcan1, &Tx1Header, RxData1, &mailbox);
 
-  
+
 }
 */
 /* USER CODE END 4 */
