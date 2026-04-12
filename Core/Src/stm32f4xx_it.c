@@ -209,10 +209,11 @@ void SysTick_Handler(void)
 
 /**
   * @brief This function handles EXTI line0 interrupt.
-  * Rear Right Wheel speed
   */
 void EXTI0_IRQHandler(void)
 {
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+  // Rear right wheelspeed
   uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
   uint32_t diff;
 
@@ -235,15 +236,20 @@ void EXTI0_IRQHandler(void)
 
   set_whlspd_rr_trig(true);
   car_started_moving();
+  /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+
+  /* USER CODE END EXTI0_IRQn 1 */
 }
 
 /**
   * @brief This function handles EXTI line1 interrupt.
-  * Rear Left Wheel speed
   */
 void EXTI1_IRQHandler(void)
 {
+  /* USER CODE BEGIN EXTI1_IRQn 0 */
+  // Rear left wheelspeed
   uint32_t now = __HAL_TIM_GET_COUNTER(&htim4);
   uint32_t diff;
 
@@ -266,7 +272,11 @@ void EXTI1_IRQHandler(void)
 
   set_whlspd_rl_trig(true);
   car_started_moving();
+  /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
+  /* USER CODE BEGIN EXTI1_IRQn 1 */
+
+  /* USER CODE END EXTI1_IRQn 1 */
 }
 
 /**
