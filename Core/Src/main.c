@@ -208,8 +208,6 @@ void HAL_CAN_RxFifo1MsgPendingCallback(CAN_HandleTypeDef *hcan2);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-
-
 /** called in 1ms periods, hopefully */
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
@@ -314,60 +312,58 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* calculate Wheel speed Rear Right */
 	if(enableRPM[0]){
+			// Disable interrupts to safely read volatile variable
+    uint32_t rr_diff_us_copy;
+    __disable_irq();
+    rr_diff_us_copy = rr_diff_us;
+    __enable_irq();
 
-    /**
-     * When a new wheel speed pulse is detected, calculate RPM based
-     * on the time difference (in microseconds) since the previous pulse.
-     */
-		if(get_whlspd_rr_trig() && rr_diff_us >= MIN_PLATE_TIME_US){
-			// Convert microseconds to milliseconds for RPM calculation
-			float rr_time_ms = (float)rr_diff_us / 1000.0;
-			rr_rpm = (((float)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
-			set_whlspd_rr_trig(false);
-			rr_last_pulse_ms = 0;  // Reset deadzone counter
+    if(rr_diff_us_copy >= MIN_PLATE_TIME_US){
+      // Convert microseconds to milliseconds for RPM calculation
+      float rr_time_ms = (float)rr_diff_us_copy / 1000.0;
+      rr_rpm = (((float)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+      set_whlspd_rr_trig(false);
+      rr_last_pulse_ms = 0;  // Reset deadzone counter
 
-			if(rr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
-				rr_rpm_sum = rr_rpm + rr_rpm_sum;
-				rr_rpm_sample_count++;
-			}
-			if(rr_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
+      if(rr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+        rr_rpm_sum = rr_rpm + rr_rpm_sum;
+        rr_rpm_sample_count++;
+      }
+      if(rr_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
         /* convert RPM to wheel speed (Km/h) */
-				WspdRR = ((rr_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
-				// Reject spikes
-				if(WspdRR > MAX_WHLSPD_KMH){
-					WspdRR = 0;
-				}
-				rr_rpm_sum = 0;
-				rr_rpm_sample_count = 0;
-			}
-		}
+        WspdRR = ((rr_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.2767 * 36 / 100;  // (2*pi*(tire D/2))*(rpm/60) tire D = 406,4mm
+        rr_rpm_sum = 0;
+        rr_rpm_sample_count = 0;
+      }
+    }
 	}
 
   /* calculate Wheel speed Rear Left */
 	if(enableRPM[1]){
+    // Disable interrupts to safely read volatile variable
+    uint32_t rl_diff_us_copy;
+    __disable_irq();
+    rl_diff_us_copy = rl_diff_us;
+    __enable_irq();
 
-		if(get_whlspd_rl_trig() && rl_diff_us >= MIN_PLATE_TIME_US){
-			// Convert microseconds to milliseconds for RPM calculation
-			float rl_time_ms = (float)rl_diff_us / 1000.0;
-			rl_rpm = (((float)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
-			set_whlspd_rl_trig(false);
-			rl_last_pulse_ms = 0;  // Reset deadzone counter
+    if(rl_diff_us_copy >= MIN_PLATE_TIME_US){
+      // Convert microseconds to milliseconds for RPM calculation
+      float rl_time_ms = (float)rl_diff_us_copy / 1000.0;
+      rl_rpm = (((float)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
+      set_whlspd_rl_trig(false);
+      rl_last_pulse_ms = 0;  // Reset deadzone counter
 
-			if(rl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
-				rl_rpm_sum = rl_rpm + rl_rpm_sum;
-				rl_rpm_sample_count++;
-			}
-			if(rl_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
+      if(rl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
+        rl_rpm_sum = rl_rpm + rl_rpm_sum;
+        rl_rpm_sample_count++;
+      }
+      if(rl_rpm_sample_count == WHLSPD_SAMPLE_COUNT){
         /* convert RPM to wheel speed (Km/h) */
-				WspdRL = ((rl_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.477 * 3.6;  // (2*pi*(tire D/2))*(rpm/60)
-				// Reject spikes
-				if(WspdRL > MAX_WHLSPD_KMH){
-					WspdRL = 0;
-				}
-				rl_rpm_sum = 0;
-				rl_rpm_sample_count = 0;
-			}
-		}
+        WspdRL = ((rl_rpm_sum/WHLSPD_SAMPLE_COUNT)/6) * 1.2767 * 36 / 100;  // (2*pi*(tire D/2))*(rpm/60)
+        rl_rpm_sum = 0;
+        rl_rpm_sample_count = 0;
+      }
+    }
 	}
 	if(enableRPM[2]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
@@ -554,15 +550,11 @@ int main(void)
 
 		//Second message data
 
-		//Filter glitches from wheel speed
-		if(WspdRL < 2000){
-			TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-			TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //8 high bits
-		}
-		if(WspdRR < 2000){
-			TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-			TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //8 high bits
-		}
+		TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
+		TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //8 high bits
+
+		TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
+		TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //8 high bits
 
 		if(suspotRL < 5500){
 			TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits

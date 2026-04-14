@@ -222,7 +222,7 @@ void EXTI0_IRQHandler(void)
     diff = now - rr_last_timestamp_us;
   } else {
     // Timer wrapped around, calculate difference accounting for overflow
-    diff = (65535UL - rr_last_timestamp_us) + now + 1;
+    diff = (65534UL - rr_last_timestamp_us) + now + 1;
   }
 
   // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
@@ -258,7 +258,7 @@ void EXTI1_IRQHandler(void)
     diff = now - rl_last_timestamp_us;
   } else {
     // Timer wrapped around, calculate difference accounting for overflow
-    diff = (65535UL - rl_last_timestamp_us) + now + 1;
+    diff = (65534UL - rl_last_timestamp_us) + now + 1;
   }
 
   // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
