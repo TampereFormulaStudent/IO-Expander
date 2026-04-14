@@ -542,11 +542,10 @@ int main(void)
 		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
 		TxData_CAN1[3] = Oilpress >> 8; //8 high bits
 
-		TxData_CAN1[4] = Coolantpressure & 0x00FF; //8 low bits
-		TxData_CAN1[5] = Coolantpressure >> 8; //8 high bits
+		TxData_CAN1[4] = Coolantpressure;
+		TxData_CAN1[5] = CoolanttempLower;
 
-		TxData_CAN1[6] = Oiltemp & 0x00FF; //8 low bits
-		TxData_CAN1[7] = Oiltemp >> 8; //8 high bits
+		TxData_CAN1[6] = Oiltemp;
 
 		//Second message data
 
@@ -567,8 +566,8 @@ int main(void)
 
 		//Third message data
 
-		TxData_CAN3[0] = CoolanttempLower & 0x00FF; //8 low bits
-		TxData_CAN3[1] = CoolanttempLower >> 8; //8 high bits
+		TxData_CAN3[0] = EXTRA1 & 0x00FF; //8 low bits
+		TxData_CAN3[1] = EXTRA1 >> 8; //8 high bits
 
 		TxData_CAN3[2] = EXTRA2 & 0x00FF; //8 low bits
 		TxData_CAN3[3] = EXTRA2 >> 8; //8 high bits
