@@ -24,6 +24,6 @@ bool is_car_moving() {
     return car_is_moving;
 }
 
-void car_started_moving() {
-    car_is_moving = true;
+void set_car_moving(bool state) {
+    car_is_moving = state;
 }

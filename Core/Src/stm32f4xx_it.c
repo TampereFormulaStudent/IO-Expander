@@ -235,7 +235,7 @@ void EXTI0_IRQHandler(void)
   rr_last_timestamp_us = now;
 
   set_whlspd_rr_trig(true);
-  car_started_moving();
+  set_car_moving(true);
   /* USER CODE END EXTI0_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
   /* USER CODE BEGIN EXTI0_IRQn 1 */
@@ -271,7 +271,7 @@ void EXTI1_IRQHandler(void)
   rl_last_timestamp_us = now;
 
   set_whlspd_rl_trig(true);
-  car_started_moving();
+  set_car_moving(true);
   /* USER CODE END EXTI1_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
   /* USER CODE BEGIN EXTI1_IRQn 1 */
@@ -285,7 +285,7 @@ void EXTI1_IRQHandler(void)
 void EXTI9_5_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI9_5_IRQn 0 */
-	car_started_moving();
+	set_car_moving(true);
 	if(HAL_GPIO_ReadPin(GPIOB,GPIO_PIN_8)){
 	rpm_ch2_trig = 0;
 	}

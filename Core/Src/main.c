@@ -123,10 +123,10 @@ float WspdFL = 0;
 
 uint16_t suspotRL = 0;
 uint16_t suspotRR = 0;
-uint16_t CoolanttempLower = 0;
-uint16_t Coolantpressure = 0;
+uint8_t CoolanttempLower = 0;
+uint8_t Coolantpressure = 0;
 uint16_t Oilpress = 0;
-uint16_t Oiltemp = 0;
+uint8_t Oiltemp = 0;
 uint16_t EXTRA1 = 0;
 uint16_t EXTRA2 = 0;
 uint16_t EXTRA3 = 0;
@@ -139,8 +139,8 @@ uint16_t EXTRA7 = 0;
 uint8_t enableRPM[4] = {0};
 
 /* Wheel speed RPM averaging variables (5-sample window) */
-float rr_rpm = 0;           // Rear Right current RPM
-float rl_rpm = 0;           // Rear Left current RPM
+uint16_t rr_rpm = 0;           // Rear Right current RPM
+uint16_t rl_rpm = 0;           // Rear Left current RPM
 float fr_rpm = 0;           // Front Right current RPM
 float fl_rpm = 0;           // Front Left current RPM
 float rr_rpm_sum = 0;       // Rear Right accumulated RPM sum
@@ -238,9 +238,12 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
      * Deadzone timeout: if no wheel speed pulse for 650ms, reset speed to 0.
      */
 		if(rr_last_pulse_ms > WHLSPD_DEADZONE_MS)
-			WspdRR = 0;
+			rr_rpm = 0;
+      set_car_moving(false);
 		if(rl_last_pulse_ms > WHLSPD_DEADZONE_MS)
-			WspdRL = 0;
+			rl_rpm = 0;
+      set_car_moving(false);
+
 		if(rpm_ch2_ms > WHLSPD_DEADZONE_MS)
 			WspdFR = 0;
 		if(rpm_ch3_ms > WHLSPD_DEADZONE_MS)
@@ -312,19 +315,18 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 
   /* calculate Wheel speed Rear Right */
 	if(enableRPM[0]){
-			// Disable interrupts to safely read volatile variable
+		// Disable interrupts to safely read volatile variable
     uint32_t rr_diff_us_copy;
     __disable_irq();
     rr_diff_us_copy = rr_diff_us;
     __enable_irq();
 
     if(rr_diff_us_copy >= MIN_PLATE_TIME_US){
-      // Convert microseconds to milliseconds for RPM calculation
-      float rr_time_ms = (float)rr_diff_us_copy / 1000.0;
-      rr_rpm = (((float)1/(rr_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
-      set_whlspd_rr_trig(false);
+      rr_rpm = 3750000UL / rr_diff_us_copy;
+      //set_whlspd_rr_trig(false);
       rr_last_pulse_ms = 0;  // Reset deadzone counter
 
+      #if 0
       if(rr_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
         rr_rpm_sum = rr_rpm + rr_rpm_sum;
         rr_rpm_sample_count++;
@@ -335,6 +337,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         rr_rpm_sum = 0;
         rr_rpm_sample_count = 0;
       }
+      #endif
+    }
+    else {
+      rr_rpm = 0;
     }
 	}
 
@@ -347,12 +353,11 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     __enable_irq();
 
     if(rl_diff_us_copy >= MIN_PLATE_TIME_US){
-      // Convert microseconds to milliseconds for RPM calculation
-      float rl_time_ms = (float)rl_diff_us_copy / 1000.0;
-      rl_rpm = (((float)1/(rl_time_ms/1000))/NUM_OF_WHLSPD_TRIG)*60;
-      set_whlspd_rl_trig(false);
+      rl_rpm = 3750000UL / rl_diff_us_copy;
+      //set_whlspd_rl_trig(false);
       rl_last_pulse_ms = 0;  // Reset deadzone counter
 
+      #if 0
       if(rl_rpm_sample_count < WHLSPD_SAMPLE_COUNT){
         rl_rpm_sum = rl_rpm + rl_rpm_sum;
         rl_rpm_sample_count++;
@@ -363,6 +368,10 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
         rl_rpm_sum = 0;
         rl_rpm_sample_count = 0;
       }
+      #endif
+    }
+    else {
+      rl_rpm = 0;
     }
 	}
 	if(enableRPM[2]){
@@ -488,16 +497,16 @@ int main(void)
 		//CoolanttempLower = (uint16_t)(round((-41.88*log((float)averageValue[8])+612.43)));
 
 		Rntc[0] = ((float)Voltage[8]/((V_REF_5V-(float)Voltage[8])/2400))-1000;
-		CoolanttempLower = (uint16_t)(round(((-33.14*log(Rntc[0]))+274.35)));
+		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 
-		Coolantpressure = (uint16_t)(0.025*(float)Voltage[9]-12.5);
+		Coolantpressure = (uint8_t)(0.025*(float)Voltage[9]-12.5);
 		Oilpress = (uint16_t)(0.025*(float)Voltage[10]-12.5);
 
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((float)Voltage[11]/1000))-3400))+297.61+274.15)/10);
 
 		Rntc[1] = ((float)Voltage[11]/((V_REF_5V-(float)Voltage[11])/2400))-1000;
-		Oiltemp = (uint16_t)(round(((-33.14*log(Rntc[1]))+274.35)));
+		Oiltemp = (uint8_t)(round(((-33.14*log(Rntc[1]))+274.35)));
 
 		/*
 		if(HAL_GPIO_ReadPin(GPIOD, GPIO_PIN_2) == RESET){
@@ -549,11 +558,11 @@ int main(void)
 
 		//Second message data
 
-		TxData_CAN2[0] = (uint16_t)WspdRL & 0x00FF; //8 low bits
-		TxData_CAN2[1] = (uint16_t)WspdRL >> 8; //8 high bits
+		TxData_CAN2[0] = rl_rpm & 0x00FF; //8 low bits
+		TxData_CAN2[1] = rl_rpm >> 8; //8 high bits
 
-		TxData_CAN2[2] = (uint16_t)WspdRR & 0x00FF; //8 low bits
-		TxData_CAN2[3] = (uint16_t)WspdRR >> 8; //8 high bits
+		TxData_CAN2[2] = rr_rpm & 0x00FF; //8 low bits
+		TxData_CAN2[3] = rr_rpm >> 8; //8 high bits
 
 		if(suspotRL < 5500){
 			TxData_CAN2[4] = suspotRL & 0x00FF; //8 low bits

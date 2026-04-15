@@ -10,4 +10,4 @@ bool get_whlspd_rl_trig();
 
 bool is_car_moving();
 
-void car_started_moving();
+void set_car_moving(bool state);
