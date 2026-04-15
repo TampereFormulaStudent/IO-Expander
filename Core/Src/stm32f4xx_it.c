@@ -226,7 +226,7 @@ void EXTI0_IRQHandler(void)
   }
 
   // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
-  if (diff < MIN_PLATE_TIME_US) {
+  if (diff < MIN_PLATE_TIME_US || diff > 10000) {
     HAL_GPIO_EXTI_IRQHandler(MCU_Freq_1_Pin);
     return;
   }
@@ -262,7 +262,7 @@ void EXTI1_IRQHandler(void)
   }
 
   // Debounce: reject pulses faster than MIN_PLATE_TIME_US (1000µs)
-  if (diff < MIN_PLATE_TIME_US) {
+  if (diff < MIN_PLATE_TIME_US || diff > 10000) {
     HAL_GPIO_EXTI_IRQHandler(MCU_Freq_0_Pin);
     return;
   }

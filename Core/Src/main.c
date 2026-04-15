@@ -107,10 +107,10 @@ uint16_t BrakepressRear = 0;
 /* Wheel speed measurements */
 volatile uint32_t rr_last_timestamp_us = 0;
 volatile uint32_t rr_diff_us = 0;
-volatile uint32_t rr_last_pulse_ms = 0;
+uint32_t rr_last_pulse_ms = 0;
 volatile uint32_t rl_last_timestamp_us = 0;
 volatile uint32_t rl_diff_us = 0;
-volatile uint32_t rl_last_pulse_ms = 0;
+uint32_t rl_last_pulse_ms = 0;
 float WspdRR = 0;
 float WspdRL = 0;
 float WspdFR = 0;
@@ -237,12 +237,28 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     /**
      * Deadzone timeout: if no wheel speed pulse for 650ms, reset speed to 0.
      */
-		if(rr_last_pulse_ms > WHLSPD_DEADZONE_MS)
-			rr_rpm = 0;
+    #if 1
+		if(rr_last_pulse_ms > WHLSPD_DEADZONE_MS) {
+      rr_rpm = 0;
+      rr_diff_us = 0;
       set_car_moving(false);
-		if(rl_last_pulse_ms > WHLSPD_DEADZONE_MS)
-			rl_rpm = 0;
+    } 
+			
+		if(rl_last_pulse_ms > WHLSPD_DEADZONE_MS) {
+      rl_rpm = 0;
+      rl_diff_us = 0;
       set_car_moving(false);
+    }
+    #elif
+
+    if(rr_last_pulse_ms > WHLSPD_DEADZONE_MS || rl_last_pulse_ms > WHLSPD_DEADZONE_MS) {
+      rr_rpm = 0;
+      rl_rpm = 0;
+      rr_diff_us = 0;
+      rl_diff_us = 0;
+      set_car_moving(false);  // Only set false when BOTH wheels timeout
+    }
+    #endif
 
 		if(rpm_ch2_ms > WHLSPD_DEADZONE_MS)
 			WspdFR = 0;
@@ -321,7 +337,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     rr_diff_us_copy = rr_diff_us;
     __enable_irq();
 
-    if(rr_diff_us_copy >= MIN_PLATE_TIME_US){
+    if(rr_diff_us_copy >= MIN_PLATE_TIME_US && rr_last_pulse_ms <= WHLSPD_DEADZONE_MS){
       rr_rpm = 3750000UL / rr_diff_us_copy;
       //set_whlspd_rr_trig(false);
       rr_last_pulse_ms = 0;  // Reset deadzone counter
@@ -352,7 +368,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
     rl_diff_us_copy = rl_diff_us;
     __enable_irq();
 
-    if(rl_diff_us_copy >= MIN_PLATE_TIME_US){
+    if(rl_diff_us_copy >= MIN_PLATE_TIME_US && rl_last_pulse_ms <= WHLSPD_DEADZONE_MS){
       rl_rpm = 3750000UL / rl_diff_us_copy;
       //set_whlspd_rl_trig(false);
       rl_last_pulse_ms = 0;  // Reset deadzone counter
