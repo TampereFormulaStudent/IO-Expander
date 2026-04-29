@@ -69,7 +69,7 @@ uint32_t TX_ID3 = 32; //0x20
 uint32_t TX_ID4 = 33; //0x21
 
 uint8_t TxTime1 = 9*4; //111Hz
-uint8_t TxTime2 = 1*4; //1000Hz
+uint8_t TxTime2 = 5*4; //200Hz
 uint8_t TxTime3 = 10*4; //100Hz
 uint8_t TxTime4 = 11*4; //90Hz
 
