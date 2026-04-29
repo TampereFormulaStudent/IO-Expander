@@ -448,7 +448,16 @@ int main(void)
 		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
 		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
-		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
+		double Oilpress_raw = (0.025*(double)Voltage[10]-12.5);
+    if (Oilpress_raw < 0.0) {
+      Oilpress = 0;
+    }
+    else if (Oilpress_raw > 65535) {
+      Oilpress = 65535U;
+    }
+    else {
+      Oilpress = (uint16_t)Oilpress_raw;
+    }
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
