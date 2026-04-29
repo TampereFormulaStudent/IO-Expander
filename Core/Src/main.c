@@ -202,7 +202,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		ms3++;
 		ms4++;
 		ms25++;
-		if(ms25 == 1000){
+		if(ms25 == 4000){
 			sec++; ms25 = 0;
 		}
 		//ADC_ValueAverage();
@@ -289,7 +289,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[0]){
 		
 		if(rpm_ch0_trig == 0){
-			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/1000))/numOfWhlSpdTrig)*60;
+			rpm_ave_0 = (((double)1/((double)rpm_ch0_ms/4000))/numOfWhlSpdTrig)*60;
 			rpm_ch0_trig = 1;
 			rpm_ch0_ms = 0; 
 			
@@ -298,7 +298,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_0++;
 			}
 			if(rpm_ave_count_0 == rpm_count){
-				WspdRR = ((rpm_ave_01/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
+				WspdRR = rpm_ave_01/rpm_count;
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
 			}
@@ -307,7 +307,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[1]){
 		
 		if(rpm_ch1_trig == 0){
-			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/1000))/numOfWhlSpdTrig)*60;
+			rpm_ave_1 = (((double)1/((double)rpm_ch1_ms/4000))/numOfWhlSpdTrig)*60;
 			rpm_ch1_trig = 1;
 			rpm_ch1_ms = 0;
 			
@@ -316,7 +316,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_count_1++;
 			}
 			if(rpm_ave_count_1 == rpm_count){
-				WspdRL = ((rpm_ave_11/rpm_count)/6) * 1.477 * 3.6; // (2*pi*(tire D/2))*(rpm/60)
+				WspdRL = rpm_ave_11/rpm_count;
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
 			}
@@ -325,7 +325,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[2]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch2_trig == 0){
-			EXTRA2 = (((double)1/((double)rpm_ch2_ms/1000))/numOfWhlSpdTrig)*60;
+			EXTRA2 = (((double)1/((double)rpm_ch2_ms/4000))/numOfWhlSpdTrig)*60;
 			rpm_ch2_trig = 1;
 			rpm_ch2_ms = 0;
 			
@@ -343,7 +343,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 	if(enableRPM[3]){
 		// NOT USED FOR FRONT WHEEL SPEED SENSOR. THIS IS AN EXTRA FREQ INPUT RPM CALCULATION!
 		if(rpm_ch3_trig == 0){
-			EXTRA1= (((double)1/((double)rpm_ch3_ms/1000))/numOfWhlSpdTrig)*60;
+			EXTRA1= (((double)1/((double)rpm_ch3_ms/4000))/numOfWhlSpdTrig)*60;
 			rpm_ch3_trig = 1;
 			rpm_ch3_ms = 0;
 		
@@ -486,9 +486,10 @@ int main(void)
 		
 		//First message data
 		
-		if(BrakepressRear < 200)
+		if(BrakepressRear < 200) {
 			TxData_CAN1[0] = BrakepressRear & 0x00FF; //8 low bits
 			TxData_CAN1[1] = BrakepressRear >> 8; //4 high bits
+    }
 		
 		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
 		TxData_CAN1[3] = Oilpress >> 8; //4 high bits

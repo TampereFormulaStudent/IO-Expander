@@ -1,0 +1,6 @@
+/home/visa/TUNI/tfs/IO-Expander/build/Release/CMakeFiles/CanModule22.dir
+/home/visa/TUNI/tfs/IO-Expander/build/Release/CMakeFiles/edit_cache.dir
+/home/visa/TUNI/tfs/IO-Expander/build/Release/CMakeFiles/rebuild_cache.dir
+/home/visa/TUNI/tfs/IO-Expander/build/Release/cmake/stm32cubemx/CMakeFiles/STM32_Drivers.dir
+/home/visa/TUNI/tfs/IO-Expander/build/Release/cmake/stm32cubemx/CMakeFiles/edit_cache.dir
+/home/visa/TUNI/tfs/IO-Expander/build/Release/cmake/stm32cubemx/CMakeFiles/rebuild_cache.dir
