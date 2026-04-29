@@ -82,7 +82,7 @@ uint16_t ms1 = 0;
 uint16_t ms2 = 0;
 uint16_t ms3 = 0;
 uint16_t ms4 = 0;
-uint16_t whl_spd_deadzone = 650;
+uint16_t whl_spd_deadzone = 650*4;
 
 uint8_t averageCount = 5;
 volatile uint8_t channel = 0;
@@ -202,7 +202,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 		ms3++;
 		ms4++;
 		ms25++;
-		if(ms25 == 4000){
+		if(ms25 >= 4000){
 			sec++; ms25 = 0;
 		}
 		//ADC_ValueAverage();
@@ -297,7 +297,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_01 = rpm_ave_0 + rpm_ave_01;
 				rpm_ave_count_0++;
 			}
-			if(rpm_ave_count_0 == rpm_count){
+			if(rpm_ave_count_0 >= rpm_count){
 				WspdRR = rpm_ave_01/rpm_count;
 				rpm_ave_01 = 0;
 				rpm_ave_count_0 = 0;
@@ -315,7 +315,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_11 = rpm_ave_1 + rpm_ave_11;
 				rpm_ave_count_1++;
 			}
-			if(rpm_ave_count_1 == rpm_count){
+			if(rpm_ave_count_1 >= rpm_count){
 				WspdRL = rpm_ave_11/rpm_count;
 				rpm_ave_11 = 0;
 				rpm_ave_count_1 = 0;
@@ -333,7 +333,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_21 = rpm_ave_2 + rpm_ave_21;
 				rpm_ave_count_2++;
 			}
-			if(rpm_ave_count_2 == rpm_count){
+			if(rpm_ave_count_2 >= rpm_count){
 				EXTRA2 = rpm_ave_21/rpm_count;
 				rpm_ave_21 = 0;
 				rpm_ave_count_2 = 0;
@@ -351,7 +351,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 				rpm_ave_31 = rpm_ave_3 + rpm_ave_31;
 				rpm_ave_count_3++;
 			}
-			if(rpm_ave_count_3 == rpm_count){
+			if(rpm_ave_count_3 >= rpm_count){
 				EXTRA1 = rpm_ave_31/rpm_count;
 				rpm_ave_31 = 0;
 				rpm_ave_count_3 = 0;
