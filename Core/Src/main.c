@@ -68,10 +68,10 @@ uint32_t TX_ID2 = 31; //0x1F
 uint32_t TX_ID3 = 32; //0x20
 uint32_t TX_ID4 = 33; //0x21
 
-uint8_t TxTime1 = 9; //111Hz
-uint8_t TxTime2 = 1; //1000Hz
-uint8_t TxTime3 = 10; //100Hz
-uint8_t TxTime4 = 11; //90Hz
+uint8_t TxTime1 = 9*4; //111Hz
+uint8_t TxTime2 = 1*4; //1000Hz
+uint8_t TxTime3 = 10*4; //100Hz
+uint8_t TxTime4 = 11*4; //90Hz
 
 CAN_FilterTypeDef sFilterConfig;
 uint32_t mailbox;
@@ -401,7 +401,7 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 	
-	//Järjestys
+	//Jï¿½rjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -911,9 +911,9 @@ static void MX_TIM4_Init(void)
 
   /* USER CODE END TIM4_Init 1 */
   htim4.Instance = TIM4;
-  htim4.Init.Prescaler = 21000-1;
+  htim4.Init.Prescaler = 41;
   htim4.Init.CounterMode = TIM_COUNTERMODE_UP;
-  htim4.Init.Period = 1;
+  htim4.Init.Period = 249;
   htim4.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
   htim4.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
   if (HAL_TIM_Base_Init(&htim4) != HAL_OK)

@@ -1,0 +1,6 @@
+../Core/Src/whlspd.c:7:6:set_whlspd_rr_trig	1
+../Core/Src/whlspd.c:11:6:get_whlspd_rr_trig	1
+../Core/Src/whlspd.c:15:6:set_whlspd_rl_trig	1
+../Core/Src/whlspd.c:19:6:get_whlspd_rl_trig	1
+../Core/Src/whlspd.c:23:6:is_car_moving	1
+../Core/Src/whlspd.c:27:6:car_started_moving	1
