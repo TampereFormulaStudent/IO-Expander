@@ -103,7 +103,7 @@ double WspdRR = 0;
 double WspdRL = 0;
 double WspdFR = 0;
 double WspdFL = 0;
-uint8_t numOfWhlSpdTrig = 16;
+uint8_t numOfWhlSpdTrig = 8;
 uint16_t suspotRL = 0;
 uint16_t suspotRR = 0;
 uint16_t CoolanttempLower = 0;
@@ -401,7 +401,7 @@ int main(void)
   MX_NVIC_Init();
   /* USER CODE BEGIN 2 */
 	
-	//Järjestys
+	//Jï¿½rjestys
 	//MX_DMA_Init();
   //MX_ADC1_Init();
 	
@@ -443,8 +443,16 @@ int main(void)
 		Rntc[0] = ((double)Voltage[8]/((Vref_5V-(double)Voltage[8])/2400))-1000;
 		CoolanttempLower = (uint8_t)(round(((-33.14*log(Rntc[0]))+274.35)));
 		
-		Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
-		Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
+    if(Voltage[9] > 500) {
+      Coolantpressure = (uint8_t)(0.025*(double)Voltage[9]-12.5);
+    } else {
+      Coolantpressure = 0;
+    }
+    if(Voltage[10] > 500) {
+      Oilpress = (uint16_t)(0.025*(double)Voltage[10]-12.5);
+    } else {
+      Oilpress = 0;
+    }
 		
 		//Oiltemp = (uint16_t)(round((-41.88*log((float)averageValue[11])+612.43)));
 		//Oiltemp = (uint16_t)(round(-37.36*log(((2400*5.05)/(5.05-((double)Voltage[11]/1000))-3400))+297.61+274.15)/10);
@@ -486,9 +494,10 @@ int main(void)
 		
 		//First message data
 		
-		if(BrakepressRear < 200)
+		if(BrakepressRear < 200) {
 			TxData_CAN1[0] = BrakepressRear & 0x00FF; //8 low bits
 			TxData_CAN1[1] = BrakepressRear >> 8; //4 high bits
+    }
 		
 		TxData_CAN1[2] = Oilpress & 0x00FF; //8 low bits
 		TxData_CAN1[3] = Oilpress >> 8; //4 high bits
@@ -812,7 +821,7 @@ static void MX_CAN1_Init(void)
 
   /* USER CODE END CAN1_Init 1 */
   hcan1.Instance = CAN1;
-  hcan1.Init.Prescaler = 6;
+  hcan1.Init.Prescaler = 3;
   hcan1.Init.Mode = CAN_MODE_NORMAL;
   hcan1.Init.SyncJumpWidth = CAN_SJW_1TQ;
   hcan1.Init.TimeSeg1 = CAN_BS1_3TQ;

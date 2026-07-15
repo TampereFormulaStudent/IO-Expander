@@ -1,0 +1,109 @@
+# Build directories
+build/
+Debug/
+Release/
+cmake-build-debug/
+cmake-build-release/
+
+# CMake artifacts
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+install_manifest.txt
+build.ninja
+.ninja_deps
+.ninja_log
+compile_commands.json
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+*.sublime-project
+*.sublime-workspace
+
+# STM32CubeMX files
+mx.scratch
+*.ioc.backup
+*.ioc.prev
+*.bak
+.mxproject
+
+# Compiler output
+*.o
+*.obj
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+*.exe
+*.out
+*.elf
+*.bin
+*.hex
+*.map
+
+# Debug symbols
+*.dSYM/
+*.su
+*.gch
+*.pch
+*.d
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Node/npm (if used for build tools)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# System files
+.DS_Store
+Thumbs.db
+.directory
+*~
+*.swp
+
+# Logs
+*.log
+
+# Object files (various compilers)
+*.o
+*.obj
+*.a
+*.ar
+*.lib
+
+# Dependency files
+*.d
+*.dep
+
+# OpenOCD
+openocd.log
